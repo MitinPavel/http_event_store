@@ -4,3 +4,6 @@ version = "0.1.0"
 authors = ["Pavlo Mitin <mitin.pavel@gmail.com>"]
 
 [dependencies]
+hyper = "0.9"
+serde = "0.8.1"
+serde_json = "0.8.1"
