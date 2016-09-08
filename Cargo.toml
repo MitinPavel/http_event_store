@@ -2,8 +2,17 @@
 name = "http_event_store"
 version = "0.1.0"
 authors = ["Pavlo Mitin <mitin.pavel@gmail.com>"]
+build = "build.rs"
+
+[features]
+default = ["serde_codegen"]
+unstable = ["serde_macros"]
+
+[build-dependencies]
+serde_codegen = { version = "^0.8", optional = true }
 
 [dependencies]
-hyper = "0.9"
-serde = "0.8.1"
-serde_json = "0.8.1"
+hyper = "^0.9"
+serde = "^0.8"
+serde_json = "^0.8"
+serde_macros = { version = "^0.8", optional = true }

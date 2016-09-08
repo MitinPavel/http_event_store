@@ -4,10 +4,24 @@ use hyper::mime::{Mime, TopLevel, SubLevel};
 use std::io::Read;
 use serde_json;
 
+use Point;
+
 pub struct Api {}
 
 impl Api {
     pub fn get(&self) {
+        let point = Point { x: 1, y: 2 };
+        let serialized = serde_json::to_string(&point).unwrap();
+
+        println!("{}", serialized);
+
+        let deserialized: Point = serde_json::from_str(&serialized).unwrap();
+
+        println!("{:?}", deserialized);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+
         let client = Client::new();
         let mut headers = Headers::new();
         headers.set(
