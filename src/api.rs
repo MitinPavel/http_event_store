@@ -29,7 +29,7 @@ impl Api {
             qitem(Mime(TopLevel::Application,
                    SubLevel::Ext("vnd.eventstore.atom+json".to_owned()), vec![]))]));
         let mut response = client
-            .get("http://127.0.0.1:2113/streams/newstream")
+            .get("http://127.0.0.1:2113/streams/newstream?embed=body")
             .headers(headers)
             .send().unwrap();
 
