@@ -1,5 +1,50 @@
 #[derive(Serialize, Deserialize, Debug)]
-struct Point {
-    x: i32,
-    y: i32,
+struct Stream {
+    author: serde_json::Value,
+    #[serde(rename = "eTag")]
+    e_tag: serde_json::Value,
+    entries: serde_json::Value,
+    #[serde(rename = "headOfStream")]
+    head_of_stream: bool,
+    id: serde_json::Value,
+    links: serde_json::Value,
+    #[serde(rename = "selfUrl")]
+    self_url: serde_json::Value,
+    #[serde(rename = "streamId")]
+    stream_id: serde_json::Value,
+    title: serde_json::Value,
+    updated: serde_json::Value // "2016-09-06T18:14:50.042706Z"
 }
+
+//"author":{"name":"EventStore"},
+//"eTag":"0;248368668",
+//"entries":[{"author":{"name":"EventStore"},
+//    "data":"{\n  \"a\": \"1\"\n}",
+//    "eventId":"fbf4a1a1-b4a3-4dfe-a01f-ec52c34e16e4",
+//    "eventNumber":0,
+//    "eventType":
+//    "event-type",
+//    "id":"http://127.0.0.1:2113/streams/newstream/0",
+//    "isJson":true,
+//    "isLinkMetaData":false,
+//    "isMetaData":false,
+//    "links":[
+//      {"relation":"edit","uri":"http://127.0.0.1:2113/streams/newstream/0"},
+//      {"relation":"alternate","uri":"http://127.0.0.1:2113/streams/newstream/0"}],
+//    "positionEventNumber":0,
+//    "positionStreamId":"newstream",
+//    "streamId":"newstream",
+//    "summary":"event-type",
+//    "title":"0@newstream",
+//    "updated":"2016-09-06T18:14:50.042706Z"}],
+//"headOfStream":true,
+//"id":"http://127.0.0.1:2113/streams/newstream",
+//"links":[
+//    {"relation":"self","uri":"http://127.0.0.1:2113/streams/newstream"},
+//    {"relation":"first","uri":"http://127.0.0.1:2113/streams/newstream/head/backward/20"},
+//    {"relation":"previous","uri":"http://127.0.0.1:2113/streams/newstream/1/forward/20"},
+//    {"relation":"metadata","uri":"http://127.0.0.1:2113/streams/newstream/metadata"}],
+//"selfUrl":"http://127.0.0.1:2113/streams/newstream",
+//"streamId":"newstream",
+//"title":"Event stream 'newstream'",
+// "updated":"2016-09-06T18:14:50.042706Z"
