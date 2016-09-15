@@ -11,6 +11,9 @@ unstable = ["serde_macros"]
 [build-dependencies]
 serde_codegen = { version = "^0.8", optional = true }
 
+[dev-dependencies]
+time = "0.1.35"
+
 [dependencies]
 hyper = "^0.9"
 serde = "^0.8"
