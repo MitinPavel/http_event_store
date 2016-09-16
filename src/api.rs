@@ -30,7 +30,7 @@ impl Api {
         println!("Result: {:?}", response);
     }
 
-    pub fn read_stream_events_forward(&self, stream_name: &str, start: u32, count: u32, resolve_link_tos: bool) -> Vec<String> {
+    pub fn read_stream_events_forward(&self, stream_name: &str, start: u32, count: u32, resolve_link_tos: bool) -> Result<Stream, String> {
         let client = Client::new();
         let mut headers = Headers::new();
         headers.set(
@@ -49,10 +49,7 @@ impl Api {
         response.read_to_string(&mut body);
         let stream: Stream = serde_json::from_str(&body).unwrap();
 
-        println!("***************************************************************");
-        println!("{:?}", stream.entries);
-
-        vec![]
+        Ok(stream)
     }
 
     pub fn get(&self) {

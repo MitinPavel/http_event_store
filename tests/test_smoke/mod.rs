@@ -1,7 +1,6 @@
 extern crate time;
 extern crate http_event_store as es;
 
-
 #[test]
 fn it_interacts_with_event_store() {
     let client = es::client::Client::new();
@@ -26,11 +25,11 @@ fn it_interacts_with_event_store() {
 
     client.append_to_stream(&stream_name, 987, raw_json.into());
 
-    client.read_stream_events_forward(&stream_name, 0, 1, true);
+    let stream = client.read_stream_events_forward(&stream_name, 0, 1, true).unwrap();
 
-    println!("Hello")
+    println!("{:?}", stream)
 }
 
 fn test_stream_name() -> String {
- format!("task-{}", time::get_time().sec)
+    format!("task-{}", time::get_time().sec)
 }

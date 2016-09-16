@@ -1,9 +1,9 @@
 #[derive(Serialize, Deserialize, Debug)]
-struct Stream {
+pub struct Stream {
     author: serde_json::Value,
     #[serde(rename = "eTag")]
     e_tag: serde_json::Value,
-    entries: serde_json::Value,
+    entries: Vec<Entry>,
     #[serde(rename = "headOfStream")]
     head_of_stream: bool,
     id: serde_json::Value,
@@ -16,14 +16,22 @@ struct Stream {
     updated: serde_json::Value // "2016-09-06T18:14:50.042706Z"
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Entry {
+    #[serde(rename = "eventId")]
+    event_id: String,
+    #[serde(rename = "eventType")]
+    event_type: String,
+    data: serde_json::Value
+}
+
 //"author":{"name":"EventStore"},
 //"eTag":"0;248368668",
 //"entries":[{"author":{"name":"EventStore"},
 //    "data":"{\n  \"a\": \"1\"\n}",
 //    "eventId":"fbf4a1a1-b4a3-4dfe-a01f-ec52c34e16e4",
 //    "eventNumber":0,
-//    "eventType":
-//    "event-type",
+//    "eventType": "event-type",
 //    "id":"http://127.0.0.1:2113/streams/newstream/0",
 //    "isJson":true,
 //    "isLinkMetaData":false,
