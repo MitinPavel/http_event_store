@@ -5,8 +5,8 @@ extern crate http_event_store as es;
 #[test]
 fn it_interacts_with_event_store() {
     let client = es::client::Client::new();
+    let stream_name = test_stream_name();
 
-    // raw string literal
     let raw_json = r#"[
                      {
                        "eventId": "50ed34a2-b26e-4610-8a2e-35ae8e63599e",
@@ -24,10 +24,9 @@ fn it_interacts_with_event_store() {
                      }
                    ]"#;
 
-    let stream_name = test_stream_name();
-    client.append_to_stream(stream_name, 987, raw_json.into());
+    client.append_to_stream(&stream_name, 987, raw_json.into());
 
-//    client.get();
+    client.read_stream_events_forward(&stream_name, 0, 1, true);
 
     println!("Hello")
 }

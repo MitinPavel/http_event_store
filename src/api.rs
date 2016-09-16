@@ -9,7 +9,7 @@ use Stream;
 pub struct Api {}
 
 impl Api {
-    pub fn append_to_stream(&self, stream_name: String, expectedVersion: u64, events_json: String) {
+    pub fn append_to_stream(&self, stream_name: &str, expectedVersion: u64, events_json: String) {
 
         let client = Client::new();
 
@@ -28,6 +28,31 @@ impl Api {
             .unwrap();
 
         println!("Result: {:?}", response);
+    }
+
+    pub fn read_stream_events_forward(&self, stream_name: &str, start: u32, count: u32, resolve_link_tos: bool) -> Vec<String> {
+        let client = Client::new();
+        let mut headers = Headers::new();
+        headers.set(
+            Accept(vec![
+            qitem(Mime(TopLevel::Application,
+                   SubLevel::Ext("vnd.eventstore.atom+json".to_owned()), vec![]))]));
+
+        let url = format!("http://127.0.0.1:2113/streams/{}?embed=body", stream_name);
+
+        let mut response = client
+            .get(&url)
+            .headers(headers)
+            .send().unwrap();
+
+        let mut body = String::new();
+        response.read_to_string(&mut body);
+        let stream: Stream = serde_json::from_str(&body).unwrap();
+
+        println!("***************************************************************");
+        println!("{:?}", stream.entries);
+
+        vec![]
     }
 
     pub fn get(&self) {
