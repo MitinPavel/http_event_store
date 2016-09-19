@@ -5,6 +5,7 @@ use std::io::Read;
 use serde_json;
 
 use Stream;
+use error::Result;
 
 pub struct Api {}
 
@@ -30,7 +31,7 @@ impl Api {
         println!("Result: {:?}", response);
     }
 
-    pub fn read_stream_events_forward(&self, stream_name: &str, start: u32, count: u32, resolve_link_tos: bool) -> Result<Stream, String> {
+    pub fn read_stream_events_forward(&self, stream_name: &str, start: u32, count: u32, resolve_link_tos: bool) -> Result<Stream> {
         let client = Client::new();
         let mut headers = Headers::new();
         headers.set(
