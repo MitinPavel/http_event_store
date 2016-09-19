@@ -5,7 +5,7 @@ use std::io::Read;
 use serde_json;
 
 use Stream;
-use error::Result;
+use types::Result;
 
 pub struct Api {}
 

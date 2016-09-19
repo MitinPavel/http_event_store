@@ -1,6 +1,6 @@
 use api::Api;
 use Stream;
-use error::Result;
+use types::Result;
 
 pub struct Client {
     api: Api

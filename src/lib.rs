@@ -12,8 +12,11 @@ include!("lib.rs.in");
 #[cfg(not(feature = "serde_macros"))]
 include!(concat!(env!("OUT_DIR"), "/lib.rs"));
 
+mod types;
 mod error;
 pub mod client;
 mod api;
 
-pub use self::error::{Result, Error};
+pub use self::error::{Error};
+
+pub use types::{Result};

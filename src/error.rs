@@ -1,7 +1,3 @@
-use std::result;
-
-//use std::error::Error;
-
 use std::io;
 use hyper;
 use serde_json;
@@ -19,5 +15,3 @@ enum Repr {
     HttpError(hyper::error::Error),
     JsonError(serde_json::error::Error)
 }
-
-pub type Result<T> = result::Result<T, Error>;
