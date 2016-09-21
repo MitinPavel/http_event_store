@@ -1,1 +1,2 @@
-mod test_smoke;
+mod test_append_to_stream;
+mod test_read_stream_events_forward;
