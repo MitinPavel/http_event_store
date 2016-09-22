@@ -17,6 +17,6 @@ mod error;
 pub mod client;
 mod api;
 
-pub use self::error::{Error};
+pub use self::error::{HesError};
 
 pub use types::{Result};

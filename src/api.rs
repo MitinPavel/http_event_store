@@ -1,11 +1,13 @@
 use hyper::Client;
 use hyper::header::{Headers, Accept, ContentType, qitem};
 use hyper::mime::{Mime, TopLevel, SubLevel};
+use hyper::status::StatusCode;
 use std::io::Read;
 use serde_json;
 
 use Stream;
 use types::Result;
+use error::HesError;
 
 pub struct Api {}
 
@@ -41,16 +43,23 @@ impl Api {
 
         let url = format!("http://127.0.0.1:2113/streams/{}?embed=body", stream_name);
 
-        let mut response = client
-            .get(&url)
-            .headers(headers)
-            .send().unwrap();
-
-        let mut body = String::new();
-        response.read_to_string(&mut body);
-        let stream: Stream = serde_json::from_str(&body).unwrap();
-
-        Ok(stream)
+        let mut response = try!(client.get(&url)
+                                      .headers(headers)
+                                      .send());
+        match response.status {
+            StatusCode::Ok => {
+                let mut body = String::new();
+                response.read_to_string(&mut body);
+                let stream: Stream = serde_json::from_str(&body).unwrap();
+                Ok(stream)
+            },
+            StatusCode::NotFound => {
+                Err(HesError::ClientError(format!("Stream {} NotFound", stream_name)))
+            },
+            _ => {
+                panic!("hyper::status::StatusCode {}", response.status)
+            }
+        }
     }
 
     pub fn get(&self) {
