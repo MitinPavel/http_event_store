@@ -3,6 +3,8 @@
 
 extern crate hyper;
 
+extern crate uuid;
+
 extern crate serde;
 extern crate serde_json;
 
@@ -14,6 +16,7 @@ include!(concat!(env!("OUT_DIR"), "/lib.rs"));
 
 mod types;
 mod error;
+pub mod event;
 pub mod client;
 mod api;
 
