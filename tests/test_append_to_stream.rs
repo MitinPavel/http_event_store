@@ -11,9 +11,21 @@ struct TaskCreated {
     name: String
 }
 
+#[derive(Clone)]
+struct TaskRenamed {
+    event_id: uuid::Uuid,
+    name: String
+}
+
 impl es::event::Event for TaskCreated {
     fn event_id(&self) -> uuid::Uuid { self.event_id }
     fn event_type(&self) -> &str { "task-created" }
+    fn data(&self) -> Option<String> { Some(format!(r#"{{ "name": "{}" }}"#, self.name)) }
+}
+
+impl es::event::Event for TaskRenamed {
+    fn event_id(&self) -> uuid::Uuid { self.event_id }
+    fn event_type(&self) -> &str { "task-renamed" }
     fn data(&self) -> Option<String> { Some(format!(r#"{{ "name": "{}" }}"#, self.name)) }
 }
 
@@ -22,8 +34,8 @@ fn it_interacts_with_event_store() {
     let client = es::client::Client::new();
     let stream_name = test_stream_name();
 
-    let events = vec![Box::new(TaskCreated { name: "A new task 09:31".to_string(), event_id: uuid::Uuid::new_v4() }),
-                      Box::new(TaskCreated { name: "A new task 09:32".to_string(), event_id: uuid::Uuid::new_v4() })];
+    let mut events: Vec<Box<es::event::Event>> =  vec![Box::new(TaskCreated { name: format!("Created {:?}", time::get_time()), event_id: uuid::Uuid::new_v4() }),
+                                                       Box::new(TaskRenamed { name: format!("Renamed {:?}", time::get_time()), event_id: uuid::Uuid::new_v4() })];
 
 
     client.append_to_stream(&stream_name, 987, events);

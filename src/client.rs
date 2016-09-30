@@ -12,7 +12,7 @@ impl Client {
         Client { api: Api {} }
     }
 
-    pub fn append_to_stream<T: Event>(&self, stream_name: &str, expectedVersion: u64, events: Vec<Box<T>>) {
+    pub fn append_to_stream(&self, stream_name: &str, expectedVersion: u64, events: Vec<Box<Event>>) {
         self.api.append_to_stream(stream_name, expectedVersion, events)
     }
 

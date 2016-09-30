@@ -13,7 +13,7 @@ use error::HesError;
 pub struct Api {}
 
 impl Api {
-    pub fn append_to_stream<T: Event>(&self, stream_name: &str, expectedVersion: u64, events: Vec<Box<T>>) {
+    pub fn append_to_stream(&self, stream_name: &str, expectedVersion: u64, events: Vec<Box<Event>>) {
         let events_as_json : Vec<String> = events.iter().map(|e| {
             format!(r#"{{
                       "eventType": "{}",

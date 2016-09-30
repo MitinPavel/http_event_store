@@ -21,3 +21,43 @@ TODO
 ====
 
 * Find MAX value for `Expected Version`.
+
+TBD
+===
+
+The best way to transform a domain event to an http_event_store event
+---------------------------------------------------------------------
+
+ES Event is a trait:
+```
+pub trait Event {
+    fn event_id(&self) -> uuid::Uuid;
+    fn event_type(&self) -> &str;
+    fn data(&self) -> Option<String>;
+}
+
+impl es::event::Event for TaskCreated {
+    fn event_id(&self) -> uuid::Uuid { self.event_id }
+    fn event_type(&self) -> &str { "task-created" }
+    fn data(&self) -> Option<String> { Some(format!(r#"{{ "name": "{}" }}"#, self.name)) }
+}
+```
+
+ES event is a struct:
+```
+pub struct Event {
+    event_id: uuid::Uuid,
+    event_type: &str,
+    data: Option<String>
+}
+
+impl From<TaskCreated> for es::event::Event {
+    fn from(t: TaskCreated) -> Self {
+        es::event::Event {
+            event_id: t.event_id,
+            event_type: "task-created",
+            data: Some(format!(r#"{{ "name": "{}" }}"#, t.name))
+        }
+    }
+}
+```
