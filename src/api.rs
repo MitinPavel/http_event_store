@@ -10,10 +10,13 @@ use event::Event;
 use types::Result;
 use error::HesError;
 
+// "ES-ExpectedVersion: 3"
+header! { (ESExpectedVersion, "ES-ExpectedVersion") => [String] }
+
 pub struct Api {}
 
 impl Api {
-    pub fn append_to_stream(&self, stream_name: &str, expectedVersion: u64, events: Vec<Box<Event>>) {
+    pub fn append_to_stream(&self, stream_name: &str, expected_version: u64, events: Vec<Box<Event>>) {
         let events_as_json : Vec<String> = events.iter().map(|e| {
             format!(r#"{{
                       "eventType": "{}",
@@ -33,6 +36,7 @@ impl Api {
         headers.set(
             ContentType(Mime(TopLevel::Application, SubLevel::Ext("vnd.eventstore.events+json".to_owned()), vec![]))
         );
+        headers.set(ESExpectedVersion("-1".to_owned()));
 
         let url = format!("http://127.0.0.1:2113/streams/{}", stream_name);
 
