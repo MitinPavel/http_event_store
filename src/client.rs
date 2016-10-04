@@ -2,6 +2,7 @@ use api::Api;
 use Stream;
 use event::Event;
 use types::Result;
+use expected_version::ExpectedVersion;
 
 pub struct Client {
     api: Api
@@ -12,7 +13,7 @@ impl Client {
         Client { api: Api {} }
     }
 
-    pub fn append_to_stream(&self, stream_name: &str, expected_version: u64, events: Vec<Box<Event>>) {
+    pub fn append_to_stream(&self, stream_name: &str, expected_version: ExpectedVersion, events: Vec<Box<Event>>) {
         self.api.append_to_stream(stream_name, expected_version, events)
     }
 

@@ -15,10 +15,11 @@ include!("lib.rs.in");
 #[cfg(not(feature = "serde_macros"))]
 include!(concat!(env!("OUT_DIR"), "/lib.rs"));
 
-mod types;
-mod error;
+pub mod expected_version;
 pub mod event;
 pub mod client;
+mod types;
+mod error;
 mod api;
 
 pub use self::error::{HesError};

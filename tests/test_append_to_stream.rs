@@ -5,21 +5,24 @@ extern crate uuid;
 extern crate http_event_store as es;
 
 mod support;
-
 use support::*;
 
+use es::event::Event;
+use es::client::Client;
+use es::expected_version::ExpectedVersion;
+
 #[test]
-fn it_interacts_with_event_store() {
+fn it_appends_events_in_right_order() {
     let created_id = "baca1a30-b6f1-470b-b68e-f79338020327";
     let renamed_id = "cbad187b-2fd0-4ad2-b78b-80d83f1ff303";
-    let events: Vec<Box<es::event::Event>> = vec![
+    let events: Vec<Box<Event>> = vec![
         Box::new(TaskCreated { name: format!("Created {:?}", time::get_time()), event_id: uuid::Uuid::parse_str("baca1a30-b6f1-470b-b68e-f79338020327").unwrap() }),
         Box::new(TaskRenamed { name: format!("Renamed {:?}", time::get_time()), event_id: uuid::Uuid::parse_str("cbad187b-2fd0-4ad2-b78b-80d83f1ff303").unwrap() })
     ];
 
-    let client = es::client::Client::new();
+    let client = Client::new();
     let stream_name = test_stream_name();
-    client.append_to_stream(&stream_name, 987, events);
+    client.append_to_stream(&stream_name, ExpectedVersion::NotExist, events);
     let stream = client.read_stream_events_forward(&stream_name, 0, 1, true).unwrap();
 
     assert_eq!("task-renamed", stream.entries[0].event_type);
