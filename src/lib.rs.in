@@ -1,28 +1,28 @@
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Stream {
-    author: serde_json::Value,
+    pub author: serde_json::Value,
     #[serde(rename = "eTag")]
-    e_tag: serde_json::Value,
-    entries: Vec<Entry>,
+    pub e_tag: serde_json::Value,
+    pub entries: Vec<Entry>,
     #[serde(rename = "headOfStream")]
-    head_of_stream: bool,
-    id: serde_json::Value,
-    links: serde_json::Value,
+    pub head_of_stream: bool,
+    pub id: serde_json::Value,
+    pub links: serde_json::Value,
     #[serde(rename = "selfUrl")]
-    self_url: serde_json::Value,
+    pub self_url: serde_json::Value,
     #[serde(rename = "streamId")]
-    stream_id: serde_json::Value,
-    title: serde_json::Value,
-    updated: serde_json::Value // "2016-09-06T18:14:50.042706Z"
+    pub stream_id: serde_json::Value,
+    pub title: serde_json::Value,
+    pub updated: serde_json::Value // "2016-09-06T18:14:50.042706Z"
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Entry {
     #[serde(rename = "eventId")]
-    event_id: String,
+    pub event_id: String,
     #[serde(rename = "eventType")]
-    event_type: String,
-    data: serde_json::Value
+    pub event_type: String,
+    pub data: serde_json::Value
 }
 
 //"author":{"name":"EventStore"},
