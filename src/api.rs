@@ -47,7 +47,7 @@ impl Api {
             .send()
             .unwrap();
 
-        println!("Result: {:?}", response);
+//        println!("Result: {:?}", response);
     }
 
     pub fn read_stream_events_forward(&self, stream_name: &str, start: u32, count: u32, resolve_link_tos: bool) -> Result<Stream> {
@@ -59,7 +59,10 @@ impl Api {
             qitem(Mime(TopLevel::Application,
                    SubLevel::Ext("vnd.eventstore.atom+json".to_owned()), vec![]))]));
 
-        let url = format!("http://127.0.0.1:2113/streams/{}?embed=body", stream_name);
+        let url = format!("http://127.0.0.1:2113/streams/{}/{}/forward/{}?embed=body",
+                          stream_name,
+                          start,
+                          count);
 
         let mut response = try!(client.get(&url)
                                       .headers(headers)

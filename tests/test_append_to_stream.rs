@@ -23,7 +23,7 @@ fn it_appends_events_in_right_order() {
     let client = Client::new();
     let stream_name = test_stream_name();
     client.append_to_stream(&stream_name, ExpectedVersion::NotExist, events);
-    let stream = client.read_stream_events_forward(&stream_name, 0, 1, true).unwrap();
+    let stream = client.read_stream_events_forward(&stream_name, 0, 2, true).unwrap();
 
     assert_eq!("task-renamed", stream.entries[0].event_type);
     assert_eq!("task-created", stream.entries[1].event_type);
@@ -31,6 +31,33 @@ fn it_appends_events_in_right_order() {
     assert_eq!("baca1a30-b6f1-470b-b68e-f79338020327", stream.entries[1].event_id);
 }
 
+#[test]
+fn it_requires_expected_version_to_be_correct() {
+    let client = Client::new();
+    let stream_name = test_stream_name();
+
+    let mut version = ExpectedVersion::NotExist;
+    client.append_to_stream(&stream_name, version, vec![Box::new(task_created_event())]);
+    assert_eq!(1, client.read_stream_events_forward(&stream_name, 0, 3, true).unwrap().entries.len());
+
+    version = ExpectedVersion::Number(0);
+    client.append_to_stream(&stream_name, version, vec![Box::new(task_renamed_event())]);
+    assert_eq!(2, client.read_stream_events_forward(&stream_name, 0, 3, true).unwrap().entries.len());
+
+    version =  ExpectedVersion::Number(1);
+    client.append_to_stream(&stream_name, version, vec![Box::new(task_renamed_event())]);
+    assert_eq!(3, client.read_stream_events_forward(&stream_name, 0, 3, true).unwrap().entries.len());
+
+    println!("{:?}", client.read_stream_events_forward(&stream_name, 0, 3, true).unwrap().entries)
+}
+
 fn test_stream_name() -> String {
-    format!("task-{}", time::get_time().sec)
+    format!("task-{}", uuid::Uuid::new_v4().simple())
+}
+
+fn task_created_event() -> TaskCreated {
+    TaskCreated { name: format!("Created {:?}", time::get_time()), event_id: uuid::Uuid::new_v4() }
+}
+fn task_renamed_event() -> TaskRenamed {
+    TaskRenamed { name: format!("Renamed {:?}", time::get_time()), event_id: uuid::Uuid::new_v4() }
 }
