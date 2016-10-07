@@ -13,6 +13,7 @@ use error::HesError;
 
 // "ES-ExpectedVersion: 3"
 header! { (ESExpectedVersion, "ES-ExpectedVersion") => [String] }
+header! { (ESResolveLinkTos, "ES-ResolveLinkTos") => [bool] }
 
 pub struct Api {}
 
@@ -58,6 +59,7 @@ impl Api {
             Accept(vec![
             qitem(Mime(TopLevel::Application,
                    SubLevel::Ext("vnd.eventstore.atom+json".to_owned()), vec![]))]));
+        headers.set(ESResolveLinkTos(resolve_link_tos));
 
         let url = format!("http://127.0.0.1:2113/streams/{}/{}/forward/{}?embed=body",
                           stream_name,
