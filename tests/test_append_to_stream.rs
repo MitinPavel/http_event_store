@@ -15,9 +15,9 @@ use es::expected_version::ExpectedVersion;
 fn it_appends_events_in_right_order() {
     let created_id = "baca1a30-b6f1-470b-b68e-f79338020327";
     let renamed_id = "cbad187b-2fd0-4ad2-b78b-80d83f1ff303";
-    let events: Vec<Box<Event>> = vec![
-        Box::new(TaskCreated { name: format!("Created {:?}", time::get_time()), event_id: uuid::Uuid::parse_str("baca1a30-b6f1-470b-b68e-f79338020327").unwrap() }),
-        Box::new(TaskRenamed { name: format!("Renamed {:?}", time::get_time()), event_id: uuid::Uuid::parse_str("cbad187b-2fd0-4ad2-b78b-80d83f1ff303").unwrap() })
+    let events: Vec<Event> = vec![
+        TaskCreated { name: format!("Created {:?}", time::get_time()), event_id: uuid::Uuid::parse_str("baca1a30-b6f1-470b-b68e-f79338020327").unwrap() }.into(),
+        TaskRenamed { name: format!("Renamed {:?}", time::get_time()), event_id: uuid::Uuid::parse_str("cbad187b-2fd0-4ad2-b78b-80d83f1ff303").unwrap() }.into()
     ];
 
     let client = Client::new();
@@ -37,15 +37,15 @@ fn it_requires_expected_version_to_be_correct() {
     let stream_name = test_stream_name();
 
     let mut version = ExpectedVersion::NotExist;
-    client.append_to_stream(&stream_name, version, vec![Box::new(task_created_event())]);
+    client.append_to_stream(&stream_name, version, vec![task_created_event().into()]);
     assert_eq!(1, client.read_stream_events_forward(&stream_name, 0, 3, true).unwrap().entries.len());
 
     version = ExpectedVersion::Number(0);
-    client.append_to_stream(&stream_name, version, vec![Box::new(task_renamed_event())]);
+    client.append_to_stream(&stream_name, version, vec![task_renamed_event().into()]);
     assert_eq!(2, client.read_stream_events_forward(&stream_name, 0, 3, true).unwrap().entries.len());
 
     version =  ExpectedVersion::Number(1);
-    client.append_to_stream(&stream_name, version, vec![Box::new(task_renamed_event())]);
+    client.append_to_stream(&stream_name, version, vec![task_renamed_event().into()]);
     assert_eq!(3, client.read_stream_events_forward(&stream_name, 0, 3, true).unwrap().entries.len());
 
     println!("{:?}", client.read_stream_events_forward(&stream_name, 0, 3, true).unwrap().entries)

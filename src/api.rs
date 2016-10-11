@@ -18,17 +18,16 @@ header! { (ESResolveLinkTos, "ES-ResolveLinkTos") => [bool] }
 pub struct Api {}
 
 impl Api {
-    pub fn append_to_stream(&self, stream_name: &str, expected_version: ExpectedVersion, events: Vec<Box<Event>>) {
+    pub fn append_to_stream(&self, stream_name: &str, expected_version: ExpectedVersion, events: Vec<Event>) {
         let events_as_json : Vec<String> = events.iter().map(|e| {
             format!(r#"{{
                       "eventType": "{}",
                       "eventId": "{}",
                       "data": {}
                     }}"#,
-                    e.event_type().to_string(),
-                    e.event_id().hyphenated().to_string(),
-                    e.data().unwrap())
-
+                    e.event_type.to_string(),
+                    e.event_id.hyphenated().to_string(),
+                    e.data.clone().unwrap()) //TODO Eliminate `clone` and deal with `unwrap`.
         }).collect::<Vec<String>>();
         let events_json : String = format!("[{}]", events_as_json.join(","));
 

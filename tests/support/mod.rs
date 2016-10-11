@@ -14,14 +14,22 @@ pub struct TaskRenamed {
     pub name: String
 }
 
-impl es::event::Event for TaskCreated {
-    fn event_id(&self) -> uuid::Uuid { self.event_id }
-    fn event_type(&self) -> &str { "task-created" }
-    fn data(&self) -> Option<String> { Some(format!(r#"{{ "name": "{}" }}"#, self.name)) }
+impl From<TaskCreated> for es::event::Event {
+    fn from(e: TaskCreated) -> Self {
+        es::event::Event {
+            event_id: e.event_id,
+            event_type: "task-created".to_string(),
+            data: Some(format!(r#"{{ "name": "{}" }}"#, e.name))
+        }
+    }
 }
 
-impl es::event::Event for TaskRenamed {
-    fn event_id(&self) -> uuid::Uuid { self.event_id }
-    fn event_type(&self) -> &str { "task-renamed" }
-    fn data(&self) -> Option<String> { Some(format!(r#"{{ "name": "{}" }}"#, self.name)) }
+impl From<TaskRenamed> for es::event::Event {
+    fn from(e: TaskRenamed) -> Self {
+        es::event::Event {
+            event_id: e.event_id,
+            event_type: "task-renamed".to_string(),
+            data: Some(format!(r#"{{ "name": "{}" }}"#, e.name))
+        }
+    }
 }
