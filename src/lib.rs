@@ -18,6 +18,7 @@ include!(concat!(env!("OUT_DIR"), "/lib.rs"));
 pub mod expected_version;
 pub mod event;
 pub mod client;
+mod macros;
 mod types;
 mod error;
 mod api;

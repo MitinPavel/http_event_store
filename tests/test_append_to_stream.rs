@@ -44,11 +44,21 @@ fn it_requires_expected_version_to_be_correct() {
     client.append_to_stream(&stream_name, version, vec![task_renamed_event().into()]);
     assert_eq!(2, client.read_stream_events_forward(&stream_name, 0, 3, true).unwrap().entries.len());
 
-    version =  ExpectedVersion::Number(1);
+    version = ExpectedVersion::Number(1);
     client.append_to_stream(&stream_name, version, vec![task_renamed_event().into()]);
     assert_eq!(3, client.read_stream_events_forward(&stream_name, 0, 3, true).unwrap().entries.len());
 
     println!("{:?}", client.read_stream_events_forward(&stream_name, 0, 3, true).unwrap().entries)
+}
+
+#[test]
+fn it_returns_err_if_expected_version_is_wrong() {
+    let client = Client::new();
+    let stream_name = test_stream_name();
+
+    let mut version = ExpectedVersion::Number(1);
+    println!("--------------------------------------------------------------");
+    let response = client.append_to_stream(&stream_name, version, vec![task_created_event().into()]);
 }
 
 fn test_stream_name() -> String {
