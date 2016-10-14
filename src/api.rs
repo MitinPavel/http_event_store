@@ -16,7 +16,7 @@ use expected_version::ExpectedVersion;
 use error::ApiError;
 use error::ClientError;
 
-// "ES-ExpectedVersion: 3"
+header! { (ESCurrentVersion, "ES-CurrentVersion") => [String] }
 header! { (ESExpectedVersion, "ES-ExpectedVersion") => [String] }
 header! { (ESResolveLinkTos, "ES-ResolveLinkTos") => [bool] }
 
@@ -78,7 +78,12 @@ impl Api {
                         match response.status_raw() {
                             &RawStatus(400, ref reason_phrase) => {
                                 if reason_phrase == "Wrong expected EventNumber" {
-                                    return Ok(()) //TODO Return special kind of error with `ES-CurrentVersion` header value
+                                    match response.headers.get::<ESCurrentVersion>() {
+                                        Some(version) => {
+                                          return Err(ApiError::ClientError(ClientError::EventNumberMismatch(ExpectedVersion::from(version.to_string()))))
+                                        },
+                                        None => panic!("Cannot find ESCurrentVersion in response: {:?}", response) //TODO
+                                    };
                                 } else {
                                   self.panic_showing(&response) //TODO Return 'generic' BadRequest
                                 }

@@ -19,3 +19,8 @@ impl From<ExpectedVersion> for String {
     }
 }
 
+impl From<String> for ExpectedVersion {
+    fn from(string: String) -> ExpectedVersion {
+        ExpectedVersion::NotExist
+    }
+}

@@ -57,8 +57,20 @@ fn it_returns_err_if_expected_version_is_wrong() {
     let stream_name = test_stream_name();
 
     let mut version = ExpectedVersion::Number(1);
-    println!("--------------------------------------------------------------");
-    let response = client.append_to_stream(&stream_name, version, vec![task_created_event().into()]);
+    let result = client.append_to_stream(&stream_name, version, vec![task_created_event().into()]);
+
+    match result {
+        Err(e) => match e {
+            es::error::ApiError::ClientError(client_error) => {
+                match client_error {
+                    es::error::ClientError::EventNumberMismatch(_) => assert!(true),
+                    _ => assert!(false)
+                }
+            },
+            _ => assert!(false)
+        },
+        _ => assert!(false)
+    }
 }
 
 fn test_stream_name() -> String {
