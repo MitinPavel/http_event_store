@@ -18,9 +18,9 @@ include!(concat!(env!("OUT_DIR"), "/lib.rs"));
 pub mod expected_version;
 pub mod event;
 pub mod client;
+pub mod error;
+pub mod types;
 mod macros;
-mod types;
-mod error;
 mod api;
 
 pub use self::error::{HesError};

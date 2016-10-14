@@ -7,5 +7,16 @@ fn attempt_to_read_nonexistent_stream() {
     let nonexistent_stream_name = "nonexistent";
     let result = client.read_stream_events_forward(&nonexistent_stream_name, 0, 1, true);
 
-    assert!(result.is_err(), "Stream should not exist")
+    match result {
+        Err(e) => match e {
+            es::error::HesError::ClientError(client_error) => {
+                match client_error {
+                    es::error::ClientError::StreamNotFound => assert!(true),
+                    _ => assert!(false)
+                }
+            },
+            _ => assert!(false)
+        },
+        _ => assert!(false)
+    }
 }

@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub enum ExpectedVersion {
     Exist,      // -4 to say that the stream should exist with any number of events in it.
     NoConflict, // -2 states that this write should never conflict with anything and should always succeed.

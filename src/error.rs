@@ -2,10 +2,18 @@ use std::error::Error;
 use std::io;
 use hyper;
 use serde_json;
+use expected_version::ExpectedVersion;
+
+#[derive(Debug)]
+pub enum ClientError {
+    EventNumberMismatch(ExpectedVersion),
+    StreamNotFound,
+    Unexpected
+}
 
 #[derive(Debug)]
 pub enum HesError {
-    ClientError(String),
+    ClientError(ClientError),
     ServerError(String),
     IoError(io::Error),
     HttpError(hyper::error::Error),

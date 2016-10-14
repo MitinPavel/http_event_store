@@ -14,6 +14,7 @@ use event::Event;
 use types::Result;
 use expected_version::ExpectedVersion;
 use error::HesError;
+use error::ClientError;
 
 // "ES-ExpectedVersion: 3"
 header! { (ESExpectedVersion, "ES-ExpectedVersion") => [String] }
@@ -90,7 +91,7 @@ impl Api {
                     _ => self.panic_showing(&response)
                 }
             },
-            Err(err) => Err(HesError::ClientError(format!("Unexpected error")))
+            Err(err) => Err(HesError::ClientError(ClientError::Unexpected))
         }
     }
 
@@ -120,7 +121,7 @@ impl Api {
                 Ok(stream)
             },
             StatusCode::NotFound => {
-                Err(HesError::ClientError(format!("Stream {} NotFound", stream_name)))
+                Err(HesError::ClientError(ClientError::StreamNotFound))
             },
             _ => {
                 self.panic_showing(&response)
