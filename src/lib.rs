@@ -23,6 +23,6 @@ pub mod types;
 mod macros;
 mod api;
 
-pub use self::error::{HesError};
+pub use self::error::{ApiError};
 
 pub use types::{Result};

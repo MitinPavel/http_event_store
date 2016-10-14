@@ -13,7 +13,7 @@ use Stream;
 use event::Event;
 use types::Result;
 use expected_version::ExpectedVersion;
-use error::HesError;
+use error::ApiError;
 use error::ClientError;
 
 // "ES-ExpectedVersion: 3"
@@ -75,8 +75,6 @@ impl Api {
                         //        url: "http://127.0.0.1:2113/streams/task-c0340f57a914468ea6b48f7dff3519dc",
                         // --->   status_raw: RawStatus(400, "Wrong expected EventNumber"),
                         //        message: Http11Message { is_proxied: false, method: None, stream: Wrapper { obj: Some(Reading(SizedReader(remaining=0))) } } }
-
-                        //                        Err(HesError::ClientError(format!("Stream {} NotFound", stream_name)))
                         match response.status_raw() {
                             &RawStatus(400, ref reason_phrase) => {
                                 if reason_phrase == "Wrong expected EventNumber" {
@@ -91,7 +89,7 @@ impl Api {
                     _ => self.panic_showing(&response)
                 }
             },
-            Err(err) => Err(HesError::ClientError(ClientError::Unexpected))
+            Err(err) => Err(ApiError::ClientError(ClientError::Unexpected))
         }
     }
 
@@ -121,7 +119,7 @@ impl Api {
                 Ok(stream)
             },
             StatusCode::NotFound => {
-                Err(HesError::ClientError(ClientError::StreamNotFound))
+                Err(ApiError::ClientError(ClientError::StreamNotFound))
             },
             _ => {
                 self.panic_showing(&response)

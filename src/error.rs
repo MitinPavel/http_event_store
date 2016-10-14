@@ -12,7 +12,7 @@ pub enum ClientError {
 }
 
 #[derive(Debug)]
-pub enum HesError {
+pub enum ApiError {
     ClientError(ClientError),
     ServerError(String),
     IoError(io::Error),
@@ -20,8 +20,8 @@ pub enum HesError {
     JsonError(serde_json::error::Error)
 }
 
-impl From<hyper::error::Error> for HesError {
-    fn from(err: hyper::error::Error) -> HesError {
-        HesError::HttpError(err)
+impl From<hyper::error::Error> for ApiError {
+    fn from(err: hyper::error::Error) -> ApiError {
+        ApiError::HttpError(err)
     }
 }

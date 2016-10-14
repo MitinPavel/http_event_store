@@ -9,7 +9,7 @@ fn attempt_to_read_nonexistent_stream() {
 
     match result {
         Err(e) => match e {
-            es::error::HesError::ClientError(client_error) => {
+            es::error::ApiError::ClientError(client_error) => {
                 match client_error {
                     es::error::ClientError::StreamNotFound => assert!(true),
                     _ => assert!(false)
