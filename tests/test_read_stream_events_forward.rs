@@ -1,6 +1,9 @@
 extern crate time;
 extern crate http_event_store as es;
 
+use es::error::HesError::*;
+use es::error::UserErrorKind::*;
+
 #[test]
 fn attempt_to_read_nonexistent_stream() {
     let client = es::client::Client::new();
@@ -9,9 +12,9 @@ fn attempt_to_read_nonexistent_stream() {
 
     match result {
         Err(e) => match e {
-            es::error::HesError::UserError(user_error) => {
+            UserError(user_error) => {
                 match user_error {
-                    es::error::UserErrorKind::StreamNotFound => assert!(true),
+                    StreamNotFound => assert!(true),
                     _ => assert!(false)
                 }
             },

@@ -10,6 +10,8 @@ use support::*;
 use es::event::Event;
 use es::client::Client;
 use es::expected_version::ExpectedVersion;
+use es::error::HesError::*;
+use es::error::UserErrorKind::*;
 
 #[test]
 fn it_appends_events_in_right_order() {
@@ -61,9 +63,9 @@ fn it_returns_err_if_expected_version_is_wrong() {
 
     match result {
         Err(e) => match e {
-            es::error::HesError::UserError(client_error) => {
+            UserError(client_error) => {
                 match client_error {
-                    es::error::UserErrorKind::EventNumberMismatch(_) => assert!(true),
+                    EventNumberMismatch(_) => assert!(true),
                     _ => assert!(false)
                 }
             },
