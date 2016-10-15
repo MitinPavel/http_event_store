@@ -13,8 +13,8 @@ use Stream;
 use event::Event;
 use types::Result;
 use expected_version::ExpectedVersion;
-use error::ApiError;
-use error::ClientError;
+use error::HesError;
+use error::UserErrorKind;
 
 header! { (ESCurrentVersion, "ES-CurrentVersion") => [String] }
 header! { (ESExpectedVersion, "ES-ExpectedVersion") => [String] }
@@ -80,7 +80,7 @@ impl Api {
                                 if reason_phrase == "Wrong expected EventNumber" {
                                     match response.headers.get::<ESCurrentVersion>() {
                                         Some(version) => {
-                                          return Err(ApiError::ClientError(ClientError::EventNumberMismatch(ExpectedVersion::from(version.to_string()))))
+                                          return Err(HesError::UserError(UserErrorKind::EventNumberMismatch(ExpectedVersion::from(version.to_string()))))
                                         },
                                         None => panic!("Cannot find ESCurrentVersion in response: {:?}", response) //TODO
                                     };
@@ -94,7 +94,7 @@ impl Api {
                     _ => self.panic_showing(&response)
                 }
             },
-            Err(err) => Err(ApiError::ClientError(ClientError::Unexpected))
+            Err(err) => Err(HesError::UserError(UserErrorKind::Unexpected))
         }
     }
 
@@ -124,7 +124,7 @@ impl Api {
                 Ok(stream)
             },
             StatusCode::NotFound => {
-                Err(ApiError::ClientError(ClientError::StreamNotFound))
+                Err(HesError::UserError(UserErrorKind::StreamNotFound))
             },
             _ => {
                 self.panic_showing(&response)

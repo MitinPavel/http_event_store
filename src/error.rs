@@ -5,23 +5,22 @@ use serde_json;
 use expected_version::ExpectedVersion;
 
 #[derive(Debug)]
-pub enum ClientError {
+pub enum HesError { // `Hes` stands for HttpEventStore
+    UserError(UserErrorKind),
+    LogicError, //TODO Introduce 1. InternalError (for bugs in the library itself) and 2. ClientError (for incorrect use of the library).
+    TransientFailure
+}
+
+#[derive(Debug)]
+pub enum UserErrorKind {
     EventNumberMismatch(ExpectedVersion),
     StreamNotFound,
     Unexpected
 }
 
-#[derive(Debug)]
-pub enum ApiError {
-    ClientError(ClientError),
-    ServerError(String),
-    IoError(io::Error),
-    HttpError(hyper::error::Error),
-    JsonError(serde_json::error::Error)
-}
-
-impl From<hyper::error::Error> for ApiError {
-    fn from(err: hyper::error::Error) -> ApiError {
-        ApiError::HttpError(err)
+impl From<hyper::error::Error> for HesError {
+    fn from(err: hyper::error::Error) -> HesError {
+        //TODO Substitute a stub below.
+        HesError::LogicError
     }
 }

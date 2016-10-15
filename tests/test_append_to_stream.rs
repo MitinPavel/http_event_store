@@ -61,9 +61,9 @@ fn it_returns_err_if_expected_version_is_wrong() {
 
     match result {
         Err(e) => match e {
-            es::error::ApiError::ClientError(client_error) => {
+            es::error::HesError::UserError(client_error) => {
                 match client_error {
-                    es::error::ClientError::EventNumberMismatch(_) => assert!(true),
+                    es::error::UserErrorKind::EventNumberMismatch(_) => assert!(true),
                     _ => assert!(false)
                 }
             },

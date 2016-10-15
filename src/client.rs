@@ -17,7 +17,7 @@ impl Client {
         self.api.append_to_stream(stream_name, expected_version, events)
     }
 
-    // TODO Restrict `count` using u8 or u16
+    //TODO Restrict `count` using u8 or u16
     pub fn read_stream_events_forward(&self, stream_name: &str, start: u32, count: u32, resolve_link_tos: bool) -> Result<Stream> {
         self.api.read_stream_events_forward(stream_name, start, count, resolve_link_tos)
     }

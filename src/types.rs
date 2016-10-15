@@ -1,7 +1,7 @@
 use std::result;
 use error;
 
-pub type Result<T> = result::Result<T, error::ApiError>;
+pub type Result<T> = result::Result<T, error::HesError>;
 
 pub enum ExpectedVersion {
     NoConflict, // -2 states that this write should never conflict with anything and should always succeed.
