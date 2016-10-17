@@ -13,7 +13,7 @@ pub enum HesError { // `Hes` stands for HttpEventStore
 
 #[derive(Debug)]
 pub enum UserErrorKind {
-    EventNumberMismatch(ExpectedVersion),
+    EventNumberMismatch(Option<ExpectedVersion>),
     StreamNotFound,
     Unexpected
 }

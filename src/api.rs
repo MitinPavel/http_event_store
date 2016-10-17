@@ -53,8 +53,6 @@ impl Api {
 
         match result {
             Ok(response) => {
-
-
                 match response.status {
                     StatusCode::Created => Ok(()),
                     StatusCode::BadRequest => {
@@ -77,13 +75,10 @@ impl Api {
                         //        message: Http11Message { is_proxied: false, method: None, stream: Wrapper { obj: Some(Reading(SizedReader(remaining=0))) } } }
                         match response.status_raw() {
                             &RawStatus(400, ref reason_phrase) => {
-                                if reason_phrase == "Wrong expected EventNumber" {
-                                    match response.headers.get::<ESCurrentVersion>() {
-                                        Some(version) => {
-                                          return Err(HesError::UserError(UserErrorKind::EventNumberMismatch(ExpectedVersion::from(version.to_string()))))
-                                        },
-                                        None => panic!("Cannot find ESCurrentVersion in response: {:?}", response) //TODO
-                                    };
+                                if reason_phrase == "Wrong expected EventNumber" { //TODO Introduce a constant.
+                                    let expected_version = response.headers.get::<ESCurrentVersion>()
+                                        .and_then(|h| Some(ExpectedVersion::from(h.to_string())));
+                                    return Err(HesError::UserError(UserErrorKind::EventNumberMismatch(expected_version)))
                                 } else {
                                   self.panic_showing(&response) //TODO Return 'generic' BadRequest
                                 }
