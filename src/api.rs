@@ -57,37 +57,7 @@ impl Api {
             Ok(response) => {
                 match response.status {
                     StatusCode::Created => Ok(()),
-                    StatusCode::BadRequest => {
-                        //      Response { status: BadRequest, headers:
-                        //        Headers { Access-Control-Allow-Headers: Content-Type, X-Requested-With,
-                        //                  X-Forwarded-Host, X-PINGOTHER, Authorization, ES-LongPoll,
-                        //                  ES-ExpectedVersion, ES-EventId, ES-EventType, ES-RequiresMaster,
-                        //                  ES-HardDelete, ES-ResolveLinkTo,
-                        //                  Content-Type: text/plain; charset=utf-8,
-                        //                  Content-Length: 0,
-                        //                  Date: Wed, 12 Oct 2016 16:24:28 GMT,
-                        //                  Connection: close,
-                        //                  Access-Control-Allow-Origin: *,
-                        // --->             ES-CurrentVersion: -1,
-                        //                  Access-Control-Expose-Headers: Location, ES-Position, ES-CurrentVersion,
-                        //                  Access-Control-Allow-Methods: POST, DELETE, GET, OPTIONS, Server: Mono-HTTPAPI/1.0, },
-                        //        version: Http11,
-                        //        url: "http://127.0.0.1:2113/streams/task-c0340f57a914468ea6b48f7dff3519dc",
-                        // --->   status_raw: RawStatus(400, "Wrong expected EventNumber"),
-                        //        message: Http11Message { is_proxied: false, method: None, stream: Wrapper { obj: Some(Reading(SizedReader(remaining=0))) } } }
-                        match response.status_raw() {
-                            &RawStatus(400, ref reason_phrase) => {
-                                if reason_phrase == WRONG_EXPECTED_EVENT_NUMBER {
-                                    let expected_version = response.headers.get::<ESCurrentVersion>()
-                                        .and_then(|h| Some(ExpectedVersion::from(h.to_string())));
-                                    return Err(HesError::UserError(UserErrorKind::EventNumberMismatch(expected_version)))
-                                } else {
-                                  self.panic_showing(&response) //TODO Return 'generic' BadRequest
-                                }
-                            },
-                            _ => self.panic_showing(&response)
-                        }
-                    },
+                    StatusCode::BadRequest => self.handle_bad_request_on_append(response),
                     _ => self.panic_showing(&response)
                 }
             },
@@ -127,6 +97,42 @@ impl Api {
                 self.panic_showing(&response)
             }
         }
+    }
+
+    fn handle_bad_request_on_append(&self, response: HyperResponse) -> Result<()> {
+        match response.status_raw() {
+            &RawStatus(400, ref reason_phrase) => {
+                //      Response { status: BadRequest, headers:
+                //        Headers { Access-Control-Allow-Headers: Content-Type, X-Requested-With,
+                //                  X-Forwarded-Host, X-PINGOTHER, Authorization, ES-LongPoll,
+                //                  ES-ExpectedVersion, ES-EventId, ES-EventType, ES-RequiresMaster,
+                //                  ES-HardDelete, ES-ResolveLinkTo,
+                //                  Content-Type: text/plain; charset=utf-8,
+                //                  Content-Length: 0,
+                //                  Date: Wed, 12 Oct 2016 16:24:28 GMT,
+                //                  Connection: close,
+                //                  Access-Control-Allow-Origin: *,
+                // --->             ES-CurrentVersion: -1,
+                //                  Access-Control-Expose-Headers: Location, ES-Position, ES-CurrentVersion,
+                //                  Access-Control-Allow-Methods: POST, DELETE, GET, OPTIONS, Server: Mono-HTTPAPI/1.0, },
+                //        version: Http11,
+                //        url: "http://127.0.0.1:2113/streams/task-c0340f57a914468ea6b48f7dff3519dc",
+                // --->   status_raw: RawStatus(400, "Wrong expected EventNumber"),
+                //        message: Http11Message { is_proxied: false, method: None, stream: Wrapper { obj: Some(Reading(SizedReader(remaining=0))) } } }
+                if reason_phrase == WRONG_EXPECTED_EVENT_NUMBER {
+                    let version = self.expected_version(&response);
+                    Err(HesError::UserError(UserErrorKind::EventNumberMismatch(version)))
+                } else {
+                    self.panic_showing(&response) //TODO Return 'generic' BadRequest
+                }
+            },
+            _ => self.panic_showing(&response)
+        }
+    }
+
+    fn expected_version(&self, response: &HyperResponse) -> Option<ExpectedVersion> {
+        response.headers.get::<ESCurrentVersion>()
+            .and_then(|header| Some(ExpectedVersion::from(header.to_string())))
     }
 
     fn panic_showing(&self, response: &HyperResponse) -> ! {
