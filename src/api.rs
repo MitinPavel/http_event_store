@@ -20,6 +20,8 @@ header! { (ESCurrentVersion, "ES-CurrentVersion") => [String] }
 header! { (ESExpectedVersion, "ES-ExpectedVersion") => [String] }
 header! { (ESResolveLinkTos, "ES-ResolveLinkTos") => [bool] }
 
+const WRONG_EXPECTED_EVENT_NUMBER: &'static str = "Wrong expected EventNumber";
+
 pub struct Api {}
 
 impl Api {
@@ -75,7 +77,7 @@ impl Api {
                         //        message: Http11Message { is_proxied: false, method: None, stream: Wrapper { obj: Some(Reading(SizedReader(remaining=0))) } } }
                         match response.status_raw() {
                             &RawStatus(400, ref reason_phrase) => {
-                                if reason_phrase == "Wrong expected EventNumber" { //TODO Introduce a constant.
+                                if reason_phrase == WRONG_EXPECTED_EVENT_NUMBER {
                                     let expected_version = response.headers.get::<ESCurrentVersion>()
                                         .and_then(|h| Some(ExpectedVersion::from(h.to_string())));
                                     return Err(HesError::UserError(UserErrorKind::EventNumberMismatch(expected_version)))
