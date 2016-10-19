@@ -54,7 +54,7 @@ fn it_requires_expected_version_to_be_correct() {
 }
 
 #[test]
-fn it_returns_err_if_expected_version_is_wrong() {
+fn it_returns_event_number_mismatch_error_if_expected_version_is_wrong() {
     let client = Client::new();
     let stream_name = test_stream_name();
 
@@ -66,6 +66,33 @@ fn it_returns_err_if_expected_version_is_wrong() {
             UserError(client_error) => {
                 match client_error {
                     EventNumberMismatch(_) => assert!(true),
+                    _ => assert!(false)
+                }
+            },
+            _ => assert!(false)
+        },
+        _ => assert!(false)
+    }
+}
+
+#[test]
+fn it_returns_bad_request_error_if_event_data_is_malformed()  {
+    let client = Client::new();
+    let stream_name = test_stream_name();
+
+    let mut version = ExpectedVersion::Number(1);
+    let malformed_event = es::event::Event {
+        event_id: uuid::Uuid::new_v4(),
+        event_type: "task-created".to_string(),
+        data: Some("?-/*".to_string())
+    };
+    let result = client.append_to_stream(&stream_name, ExpectedVersion::NotExist, vec![malformed_event]);
+
+    match result {
+        Err(e) => match e {
+            UserError(client_error) => {
+                match client_error {
+                    BadRequest(_) => assert!(true),
                     _ => assert!(false)
                 }
             },

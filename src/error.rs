@@ -15,12 +15,12 @@ pub enum HesError { // `Hes` stands for HttpEventStore
 pub enum UserErrorKind {
     EventNumberMismatch(Option<ExpectedVersion>),
     StreamNotFound,
+    BadRequest(hyper::client::Response),
     Unexpected
 }
 
 impl From<hyper::error::Error> for HesError {
     fn from(err: hyper::error::Error) -> HesError {
-        //TODO Substitute a stub below.
-        HesError::LogicError
+        HesError::UserError(UserErrorKind::Unexpected)
     }
 }
