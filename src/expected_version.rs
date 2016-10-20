@@ -37,7 +37,7 @@ impl From<String> for ExpectedVersion {
 impl ExpectedVersion {
     fn parse_number_or_unexpected(string: String) -> ExpectedVersion {
         match string.parse::<u64>() {
-            Ok(n) => if n >= 0 { ExpectedVersion::Number(n) } else { ExpectedVersion::Unexpected(string) },
+            Ok(n) =>  ExpectedVersion::Number(n),
             Err(_) => ExpectedVersion::Unexpected(string)
         }
     }
