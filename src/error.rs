@@ -4,7 +4,7 @@ use expected_version::ExpectedVersion;
 #[derive(Debug)]
 pub enum HesError { // `Hes` stands for HttpEventStore
     UserError(UserErrorKind),
-    LogicError, //TODO Introduce 1. InternalError (for bugs in the library itself) and 2. ClientError (for incorrect use of the library).
+    //LogicError,
     TransientFailure
 }
 
