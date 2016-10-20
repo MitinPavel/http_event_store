@@ -55,7 +55,7 @@ impl Appender {
                     _ => self.panic_showing(&response)
                 }
             },
-            Err(err) => Err(HesError::UserError(UserErrorKind::Unexpected))
+            Err(err) => Err(HesError::UserError(UserErrorKind::Http(err)))
         }
     }
 

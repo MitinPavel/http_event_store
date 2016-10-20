@@ -13,11 +13,11 @@ pub enum UserErrorKind {
     EventNumberMismatch(Option<ExpectedVersion>),
     StreamNotFound,
     BadRequest(hyper::client::Response),
-    Unexpected
+    Http(hyper::error::Error)
 }
 
 impl From<hyper::error::Error> for HesError {
     fn from(err: hyper::error::Error) -> HesError {
-        HesError::UserError(UserErrorKind::Unexpected) //TODO Capture hyper::error::Error
+        HesError::UserError(UserErrorKind::Http(err))
     }
 }
