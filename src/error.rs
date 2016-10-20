@@ -1,7 +1,4 @@
-use std::error::Error;
-use std::io;
 use hyper;
-use serde_json;
 use expected_version::ExpectedVersion;
 
 #[derive(Debug)]
@@ -21,6 +18,6 @@ pub enum UserErrorKind {
 
 impl From<hyper::error::Error> for HesError {
     fn from(err: hyper::error::Error) -> HesError {
-        HesError::UserError(UserErrorKind::Unexpected)
+        HesError::UserError(UserErrorKind::Unexpected) //TODO Capture hyper::error::Error
     }
 }

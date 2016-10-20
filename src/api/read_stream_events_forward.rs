@@ -1,18 +1,13 @@
 use hyper::Client;
-use hyper::header::{Headers, Accept, ContentType, qitem};
-use hyper::Result as HyperResult;
+use hyper::header::{Headers, Accept, qitem};
 use hyper::client::Response as HyperResponse;
 use hyper::mime::{Mime, TopLevel, SubLevel};
 use hyper::status::StatusCode;
-use hyper::http::RawStatus;
 use std::io::Read;
 use serde_json;
-use std::borrow::Cow;
 
 use Stream;
-use event::Event;
 use types::Result;
-use expected_version::ExpectedVersion;
 use error::HesError;
 use error::UserErrorKind;
 
@@ -42,7 +37,7 @@ impl Reader {
         match response.status {
             StatusCode::Ok => {
                 let mut body = String::new();
-                response.read_to_string(&mut body);
+                response.read_to_string(&mut body).unwrap(); //TODO Handle Result.
                 let stream: Stream = serde_json::from_str(&body).unwrap();
                 Ok(stream)
             },

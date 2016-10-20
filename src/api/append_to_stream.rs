@@ -1,15 +1,10 @@
 use hyper::Client;
-use hyper::header::{Headers, Accept, ContentType, qitem};
+use hyper::header::{Headers, ContentType};
 use hyper::Result as HyperResult;
 use hyper::client::Response as HyperResponse;
 use hyper::mime::{Mime, TopLevel, SubLevel};
 use hyper::status::StatusCode;
-use hyper::http::RawStatus;
-use std::io::Read;
-use serde_json;
-use std::borrow::Cow;
 
-use Stream;
 use event::Event;
 use types::Result;
 use expected_version::ExpectedVersion;
