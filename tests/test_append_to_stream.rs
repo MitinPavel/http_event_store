@@ -20,7 +20,7 @@ fn it_appends_events_in_right_order() {
         TaskRenamed { name: format!("Renamed {:?}", time::get_time()), event_id: uuid::Uuid::parse_str("cbad187b-2fd0-4ad2-b78b-80d83f1ff303").unwrap() }.into()
     ];
 
-    let client = Client::new();
+    let client = Client::default();
     let stream_name = test_stream_name();
     client.append_to_stream(&stream_name, ExpectedVersion::NotExist, events).unwrap();
     let stream = client.read_stream_events_forward(&stream_name, 0, 2, true).unwrap();
@@ -33,7 +33,7 @@ fn it_appends_events_in_right_order() {
 
 #[test]
 fn it_requires_expected_version_to_be_correct() {
-    let client = Client::new();
+    let client = Client::default();
     let stream_name = test_stream_name();
 
     let mut version = ExpectedVersion::NotExist;
@@ -53,7 +53,7 @@ fn it_requires_expected_version_to_be_correct() {
 
 #[test]
 fn it_returns_event_number_mismatch_error_if_expected_version_is_wrong() {
-    let client = Client::new();
+    let client = Client::default();
     let stream_name = test_stream_name();
 
     let version = ExpectedVersion::Number(1);
@@ -75,7 +75,7 @@ fn it_returns_event_number_mismatch_error_if_expected_version_is_wrong() {
 
 #[test]
 fn it_returns_bad_request_error_if_event_data_is_malformed()  {
-    let client = Client::new();
+    let client = Client::default();
     let stream_name = test_stream_name();
 
     let malformed_event = es::event::Event {

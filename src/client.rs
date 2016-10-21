@@ -4,19 +4,28 @@ use Stream;
 use event::Event;
 use types::Result;
 use expected_version::ExpectedVersion;
+use connection::ConnectionInfo;
 
 pub struct Client {
-    //host: &str
-    //port: ...
+    connection_info: ConnectionInfo,
 }
 
 impl Client {
-    pub fn new() -> Client {
-        Client {}
+    pub fn new(connection_info: ConnectionInfo) -> Client {
+        Client { connection_info: connection_info }
+    }
+
+    pub fn default() -> Client {
+        Client {
+            connection_info: ConnectionInfo {
+                host: "127.0.0.1".into(),
+                port: 2113
+            }
+        }
     }
 
     pub fn append_to_stream(&self, stream_name: &str, expected_version: ExpectedVersion, events: Vec<Event>) -> Result<()> {
-        let appender = Appender {};
+        let appender = Appender::new(&self.connection_info);
         appender.append_to_stream(stream_name, expected_version, events)
     }
 

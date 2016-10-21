@@ -10,15 +10,22 @@ use types::Result;
 use expected_version::ExpectedVersion;
 use error::HesError;
 use error::UserErrorKind;
+use connection::ConnectionInfo;
 
 use api::ESCurrentVersion;
 use api::ESExpectedVersion;
 
 const WRONG_EXPECTED_EVENT_NUMBER: &'static str = "Wrong expected EventNumber";
 
-pub struct Appender {}
+pub struct Appender<'a> {
+   connection_info: &'a ConnectionInfo,
+}
 
-impl Appender {
+impl<'a> Appender<'a> {
+    pub fn new(connection_info: &'a ConnectionInfo) -> Appender {
+        Appender { connection_info: connection_info }
+    }
+
     pub fn append_to_stream(&self, stream_name: &str, expected_version: ExpectedVersion, events: Vec<Event>) -> Result<()> {
         let events_as_json : Vec<String> = events.iter().map(|e| {
             format!(r#"{{
@@ -32,7 +39,7 @@ impl Appender {
         }).collect::<Vec<String>>();
         let events_json: String = format!("[{}]", events_as_json.join(","));
 
-        let client = Client::new();
+        let client = Client::default();
 
         let mut headers = Headers::new();
         headers.set(
@@ -40,9 +47,7 @@ impl Appender {
         );
         headers.set(ESExpectedVersion(expected_version.into()));
 
-        let url = format!("http://127.0.0.1:2113/streams/{}", stream_name);
-
-        let result: HyperResult<HyperResponse> = client.post(&url)
+        let result: HyperResult<HyperResponse> = client.post(&self.url(stream_name))
             .headers(headers)
             .body(&events_json)
             .send();
@@ -57,6 +62,13 @@ impl Appender {
             },
             Err(err) => Err(HesError::UserError(UserErrorKind::Http(err)))
         }
+    }
+
+    fn url(&self, stream_name: &str) -> String {
+        format!("http://{}:{}/streams/{}",
+                self.connection_info.host,
+                self.connection_info.port,
+                stream_name)
     }
 
     fn handle_bad_request_on_append(&self, response: HyperResponse) -> Result<()> {

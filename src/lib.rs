@@ -20,6 +20,7 @@ pub mod event;
 pub mod client;
 pub mod error;
 pub mod types;
+mod connection;
 mod macros;
 mod api;
 
