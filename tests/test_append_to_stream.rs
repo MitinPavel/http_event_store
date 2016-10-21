@@ -2,16 +2,34 @@ extern crate serde;
 extern crate serde_json;
 extern crate time;
 extern crate uuid;
-extern crate http_event_store as es;
+extern crate http_event_store as hes;
 
 mod support;
 use support::*;
 
-use es::event::Event;
-use es::client::Client;
-use es::expected_version::ExpectedVersion;
-use es::error::HesError::*;
-use es::error::UserErrorKind::*;
+use hes::event::Event;
+use hes::client::Client;
+use hes::expected_version::ExpectedVersion;
+use hes::error::HesError::*;
+use hes::error::UserErrorKind::*;
+use hes::types::Result as HesResult;
+
+
+macro_rules! assert_user_error {
+    ($kind:pat, $actual_error:expr) => ({
+        assert!(
+            match $actual_error {
+                hes::error::HesError::UserError(k) => {
+                      match k {
+                          $kind => true,
+                          _ => false
+                      }
+                },
+                _ => false
+        })
+
+    })
+}
 
 #[test]
 fn it_appends_events_in_right_order() {
@@ -59,45 +77,24 @@ fn it_returns_event_number_mismatch_error_if_expected_version_is_wrong() {
     let version = ExpectedVersion::Number(1);
     let result = client.append_to_stream(&stream_name, version, vec![task_created_event().into()]);
 
-    match result {
-        Err(e) => match e {
-            UserError(client_error) => {
-                match client_error {
-                    EventNumberMismatch(_) => assert!(true),
-                    _ => assert!(false)
-                }
-            },
-            _ => assert!(false)
-        },
-        _ => assert!(false)
-    }
+    assert_user_error!(EventNumberMismatch(..), result.unwrap_err());
 }
 
 #[test]
-fn it_returns_bad_request_error_if_event_data_is_malformed()  {
+fn it_returns_bad_request_error_if_event_data_is_malformed() {
     let client = Client::default();
     let stream_name = test_stream_name();
 
-    let malformed_event = es::event::Event {
+    let malformed_event = hes::event::Event {
         event_id: uuid::Uuid::new_v4(),
         event_type: "task-created".to_string(),
         data: Some("?-/*".to_string())
     };
     let result = client.append_to_stream(&stream_name, ExpectedVersion::NotExist, vec![malformed_event]);
 
-    match result {
-        Err(e) => match e {
-            UserError(client_error) => {
-                match client_error {
-                    BadRequest(_) => assert!(true),
-                    _ => assert!(false)
-                }
-            },
-            _ => assert!(false)
-        },
-        _ => assert!(false)
-    }
+    assert_user_error!(BadRequest(..), result.unwrap_err());
 }
+
 
 fn test_stream_name() -> String {
     format!("task-{}", uuid::Uuid::new_v4().simple())
