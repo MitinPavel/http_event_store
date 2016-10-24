@@ -1,35 +1,4 @@
-extern crate uuid;
-extern crate http_event_store as es;
+#[macro_use]
+pub mod assert;
 
-//#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
-#[derive(Clone)]
-pub struct TaskCreated {
-    pub event_id: uuid::Uuid,
-    pub name: String
-}
-
-#[derive(Clone)]
-pub struct TaskRenamed {
-    pub event_id: uuid::Uuid,
-    pub name: String
-}
-
-impl From<TaskCreated> for es::event::Event {
-    fn from(e: TaskCreated) -> Self {
-        es::event::Event {
-            event_id: e.event_id,
-            event_type: "task-created".to_string(),
-            data: Some(format!(r#"{{ "name": "{}" }}"#, e.name))
-        }
-    }
-}
-
-impl From<TaskRenamed> for es::event::Event {
-    fn from(e: TaskRenamed) -> Self {
-        es::event::Event {
-            event_id: e.event_id,
-            event_type: "task-renamed".to_string(),
-            data: Some(format!(r#"{{ "name": "{}" }}"#, e.name))
-        }
-    }
-}
+pub mod task_domain;
