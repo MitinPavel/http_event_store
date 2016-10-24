@@ -12,6 +12,7 @@ use support::task_domain::*;
 use hes::event::Event;
 use hes::client::Client;
 use hes::expected_version::ExpectedVersion;
+use hes::error::HesError::*;
 use hes::error::UserErrorKind::*;
 
 #[test]
@@ -60,7 +61,7 @@ fn it_returns_event_number_mismatch_error_if_expected_version_is_wrong() {
     let version = ExpectedVersion::Number(1);
     let result = client.append_to_stream(&stream_name, version, vec![task_created_event().into()]);
 
-    assert_user_error!(EventNumberMismatch(..), result.unwrap_err());
+    assert_error!(UserError, EventNumberMismatch(..), result.unwrap_err());
 }
 
 #[test]
@@ -75,7 +76,7 @@ fn it_returns_bad_request_error_if_event_data_is_malformed() {
     };
     let result = client.append_to_stream(&stream_name, ExpectedVersion::NotExist, vec![malformed_event]);
 
-    assert_user_error!(BadRequest(..), result.unwrap_err());
+    assert_error!(UserError, BadRequest(..), result.unwrap_err());
 }
 
 
