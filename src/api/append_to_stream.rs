@@ -1,7 +1,7 @@
 use hyper::Client;
-use hyper::header::{Headers, ContentType};
 use hyper::Result as HyperResult;
 use hyper::client::Response as HyperResponse;
+use hyper::header::{Headers, ContentType};
 use hyper::mime::{Mime, TopLevel, SubLevel};
 use hyper::status::StatusCode;
 
@@ -41,17 +41,33 @@ impl<'a> Appender<'a> {
 
         let client = Client::default();
 
+        let result = client.post(&self.url(stream_name))
+            .headers(self.build_headers(expected_version))
+            .body(&events_json)
+            .send();
+
+        self.handle_result(result)
+    }
+
+    fn build_headers(&self, expected_version: ExpectedVersion) -> Headers {
         let mut headers = Headers::new();
         headers.set(
             ContentType(Mime(TopLevel::Application, SubLevel::Ext("vnd.eventstore.events+json".to_owned()), vec![]))
         );
         headers.set(ESExpectedVersion(expected_version.into()));
 
-        let result: HyperResult<HyperResponse> = client.post(&self.url(stream_name))
-            .headers(headers)
-            .body(&events_json)
-            .send();
+        headers
+    }
 
+    fn url(&self, stream_name: &str) -> String {
+        format!("http://{}:{}/streams/{}",
+                self.connection_info.host,
+                self.connection_info.port,
+                stream_name)
+    }
+
+    //TODO Find better name. `handle_...` supposes no return value.
+    fn handle_result(&self, result: HyperResult<HyperResponse>) -> Result<()> {
         match result {
             Ok(response) => {
                 match response.status {
@@ -62,13 +78,6 @@ impl<'a> Appender<'a> {
             },
             Err(err) => Err(HesError::UserError(UserErrorKind::Http(err)))
         }
-    }
-
-    fn url(&self, stream_name: &str) -> String {
-        format!("http://{}:{}/streams/{}",
-                self.connection_info.host,
-                self.connection_info.port,
-                stream_name)
     }
 
     fn handle_bad_request_on_append(&self, response: HyperResponse) -> Result<()> {
