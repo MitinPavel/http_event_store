@@ -27,6 +27,17 @@ impl<'a> Appender<'a> {
     }
 
     pub fn append_to_stream(&self, stream_name: &str, expected_version: ExpectedVersion, events: Vec<Event>) -> Result<()> {
+        let client = Client::default();
+
+        let result = client.post(&self.url(stream_name))
+            .headers(self.build_headers(expected_version))
+            .body(&self.request_body(events))
+            .send();
+
+        self.handle_result(result)
+    }
+
+    fn request_body(&self, events: Vec<Event>) -> String {
         let events_as_json : Vec<String> = events.iter().map(|e| {
             format!(r#"{{
                       "eventType": "{}",
@@ -36,17 +47,9 @@ impl<'a> Appender<'a> {
                     e.event_type.to_string(),
                     e.event_id.hyphenated().to_string(),
                     e.data.clone().unwrap()) //TODO Eliminate `clone` and deal with `unwrap`.
-        }).collect::<Vec<String>>();
-        let events_json: String = format!("[{}]", events_as_json.join(","));
+        }).collect::<_>();
 
-        let client = Client::default();
-
-        let result = client.post(&self.url(stream_name))
-            .headers(self.build_headers(expected_version))
-            .body(&events_json)
-            .send();
-
-        self.handle_result(result)
+        format!("[{}]", events_as_json.join(","))
     }
 
     fn build_headers(&self, expected_version: ExpectedVersion) -> Headers {

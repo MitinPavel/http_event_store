@@ -21,6 +21,7 @@ TODO
 ====
 
 * Find MAX value for `Expected Version`.
+* Create more tests for api::append_to_stream::Appender getting inspiration from https://github.com/EventStore/EventStore/blob/08c2bdf7dcadd154cffa549d273e3a8e4673c5a1/src/EventStore.Core.Tests/Http/Streams/append_to_stream.cs
 
 TBD
 ===
