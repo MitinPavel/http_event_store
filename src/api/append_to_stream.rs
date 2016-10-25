@@ -73,7 +73,7 @@ impl<'a> Appender<'a> {
                 match response.status {
                     StatusCode::Created => Ok(()),
                     StatusCode::BadRequest => self.handle_bad_request_on_append(response),
-                    _ => self.panic_showing(&response)
+                    _ => Err(HesError::UserError(UserErrorKind::UnexpectedResponse(response)))
                 }
             },
             Err(err) => Err(HesError::UserError(UserErrorKind::Http(err)))
@@ -114,9 +114,5 @@ impl<'a> Appender<'a> {
     fn expected_version(&self, response: &HyperResponse) -> Option<ExpectedVersion> {
         response.headers.get::<ESCurrentVersion>()
             .and_then(|header| Some(ExpectedVersion::from(header.to_string())))
-    }
-
-    fn panic_showing(&self, response: &HyperResponse) -> ! {
-        panic!("hyper::status::StatusCode {} Response: {:?}", response.status, response)
     }
 }

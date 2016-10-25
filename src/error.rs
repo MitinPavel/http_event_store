@@ -13,6 +13,7 @@ pub enum UserErrorKind {
     EventNumberMismatch(Option<ExpectedVersion>),
     StreamNotFound,
     BadRequest(hyper::client::Response),
+    UnexpectedResponse(hyper::client::Response),
     Http(hyper::error::Error)
 }
 
