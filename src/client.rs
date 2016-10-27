@@ -1,5 +1,6 @@
 use api::append_to_stream::Appender;
 use api::read_stream_events_forward::Reader;
+use api::delete_stream::Deleter;
 use Stream;
 use event::Event;
 use types::Result;
@@ -33,5 +34,10 @@ impl Client {
     pub fn read_stream_events_forward(&self, stream_name: &str, start: u32, count: u32, resolve_link_tos: bool) -> Result<Stream> {
         let reader = Reader {};
         reader.read_stream_events_forward(stream_name, start, count, resolve_link_tos)
+    }
+
+    pub fn delete_stream(&self, stream_name: &str) -> Result<()> {
+        let deleter = Deleter::new(&self.connection_info);
+        deleter.delete(stream_name)
     }
 }
