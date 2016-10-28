@@ -22,7 +22,7 @@ fn smoke_test() {
 
     let client = Client::default();
     let stream_name = test_stream_name();
-    client.append_to_stream(&stream_name, ExpectedVersion::NotExist, events).unwrap();
+    client.append_to_stream(&stream_name, ExpectedVersion::NoStream, events).unwrap();
 
     assert!(client.delete_stream(&stream_name).is_ok());
 }

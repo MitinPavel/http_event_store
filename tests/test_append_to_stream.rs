@@ -24,7 +24,7 @@ fn it_appends_events_in_right_order() {
 
     let client = Client::default();
     let stream_name = test_stream_name();
-    client.append_to_stream(&stream_name, ExpectedVersion::NotExist, events).unwrap();
+    client.append_to_stream(&stream_name, ExpectedVersion::NoStream, events).unwrap();
     let stream = client.read_stream_events_forward(&stream_name, 0, 2, true).unwrap();
 
     assert_eq!("task-renamed", stream.entries[0].event_type);
@@ -38,7 +38,7 @@ fn it_requires_expected_version_to_be_correct() {
     let client = Client::default();
     let stream_name = test_stream_name();
 
-    let mut version = ExpectedVersion::NotExist;
+    let mut version = ExpectedVersion::NoStream;
     client.append_to_stream(&stream_name, version, vec![task_created_event().into()]).unwrap();
     assert_eq!(1, client.read_stream_events_forward(&stream_name, 0, 3, true).unwrap().entries.len());
 
@@ -74,7 +74,7 @@ fn it_returns_bad_request_error_if_event_data_is_malformed() {
         event_type: "task-created".to_string(),
         data: Some("?-/*".to_string())
     };
-    let result = client.append_to_stream(&stream_name, ExpectedVersion::NotExist, vec![malformed_event]);
+    let result = client.append_to_stream(&stream_name, ExpectedVersion::NoStream, vec![malformed_event]);
 
     assert_error!(UserError, BadRequest(..), result.unwrap_err());
 }
