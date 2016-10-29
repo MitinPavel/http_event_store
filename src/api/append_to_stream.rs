@@ -16,6 +16,7 @@ use api::ESCurrentVersion;
 use api::ESExpectedVersion;
 
 const WRONG_EXPECTED_EVENT_NUMBER: &'static str = "Wrong expected EventNumber";
+const STREAM_DELETED: &'static str = "Stream deleted";
 
 pub struct Appender<'a> {
    connection_info: &'a ConnectionInfo,
@@ -75,7 +76,8 @@ impl<'a> Appender<'a> {
             Ok(response) => {
                 match response.status {
                     StatusCode::Created => Ok(()),
-                    StatusCode::BadRequest => self.handle_bad_request_on_append(response),
+                    StatusCode::BadRequest => self.handle_bad_request(response),
+                    StatusCode::Gone => self.handle_gone(response),
                     _ => Err(HesError::UserError(UserErrorKind::UnexpectedResponse(response)))
                 }
             },
@@ -83,7 +85,7 @@ impl<'a> Appender<'a> {
         }
     }
 
-    fn handle_bad_request_on_append(&self, response: HyperResponse) -> Result<()> {
+    fn handle_bad_request(&self, response: HyperResponse) -> Result<()> {
         // RawStatus(400, ref reason_phrase) => {
         //   Response { status: BadRequest, headers:
         //     Headers { Access-Control-Allow-Headers: Content-Type, X-Requested-With,
@@ -109,6 +111,29 @@ impl<'a> Appender<'a> {
             UserErrorKind::EventNumberMismatch(version)
         } else {
             UserErrorKind::BadRequest(response)
+        };
+
+        Err(HesError::UserError(error_kind))
+    }
+
+    fn handle_gone(&self, response: HyperResponse) -> Result<()> {
+        //      Ok(Response { status: Gone, headers: Headers { Content-Type: text/plain; charset=utf-8,
+        //      Access-Control-Allow-Origin: *, Access-Control-Expose-Headers: Location, ES-Position, ES-CurrentVersion,
+        //      Server: Mono-HTTPAPI/1.0, Content-Length: 0, Date: Fri, 28 Oct 2016 06:56:54 GMT,
+        //      Access-Control-Allow-Headers: Content-Type, X-Requested-With,
+        //      X-Forwarded-Host, X-PINGOTHER, Authorization, ES-LongPoll, ES-ExpectedVersion,
+        //      ES-EventId, ES-EventType, ES-RequiresMaster, ES-HardDelete,
+        //      ES-ResolveLinkTo, Access-Control-Allow-Methods: POST, DELETE, GET, OPTIONS, Keep-Alive: timeout=15,max=100, },
+        //      version: Http11, url: "http://127.0.0.1:2113/streams/task-72da3c69876d4dbebca1eb2ae0f6e208",
+        // -->  status_raw: RawStatus(410, "Stream deleted"),
+        //      message: Http11Message { is_proxied: false, method: None,
+        //      stream: Wrapper { obj: Some(Reading(SizedReader(remaining=0))) } } })
+        let is_deleted = { response.status_raw().1 == STREAM_DELETED };
+
+        let error_kind = if is_deleted {
+            UserErrorKind::StreamDeleted
+        } else {
+            UserErrorKind::UnexpectedResponse(response)
         };
 
         Err(HesError::UserError(error_kind))

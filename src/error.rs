@@ -12,6 +12,7 @@ pub enum HesError { // `Hes` stands for HttpEventStore
 pub enum UserErrorKind {
     EventNumberMismatch(Option<ExpectedVersion>),
     StreamNotFound,
+    StreamDeleted,
     BadRequest(hyper::client::Response),
     UnexpectedResponse(hyper::client::Response),
     Http(hyper::error::Error)
