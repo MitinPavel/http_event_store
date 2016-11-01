@@ -28,7 +28,7 @@ impl<'a> Appender<'a> {
         Appender { connection_info: connection_info }
     }
 
-    pub fn append_to_stream(&self, stream_name: &str, expected_version: ExpectedVersion, events: Vec<Event>) -> Result<()> {
+    pub fn append(&self, stream_name: &str, expected_version: ExpectedVersion, events: Vec<Event>) -> Result<()> {
         let client = Client::default();
 
         let result = client.post(&self.url(stream_name))

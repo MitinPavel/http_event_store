@@ -27,7 +27,7 @@ impl Client {
 
     pub fn append_to_stream(&self, stream_name: &str, expected_version: ExpectedVersion, events: Vec<Event>) -> Result<()> {
         let appender = Appender::new(&self.connection_info);
-        appender.append_to_stream(stream_name, expected_version, events)
+        appender.append(stream_name, expected_version, events)
     }
 
     //TODO Restrict `count` using u8 or u16
