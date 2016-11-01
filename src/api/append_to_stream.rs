@@ -1,3 +1,4 @@
+use std::result::Result as StdResult;
 use hyper::Client;
 use hyper::Result as HyperResult;
 use hyper::client::Response as HyperResponse;
@@ -19,7 +20,7 @@ const WRONG_EXPECTED_EVENT_NUMBER: &'static str = "Wrong expected EventNumber";
 const STREAM_DELETED: &'static str = "Stream deleted";
 
 pub struct Appender<'a> {
-   connection_info: &'a ConnectionInfo,
+    connection_info: &'a ConnectionInfo,
 }
 
 impl<'a> Appender<'a> {
@@ -31,36 +32,11 @@ impl<'a> Appender<'a> {
         let client = Client::default();
 
         let result = client.post(&self.url(stream_name))
-            .headers(self.build_headers(expected_version))
-            .body(&self.request_body(events))
+            .headers(build_headers(expected_version))
+            .body(&request_body(events))
             .send();
 
-        self.handle_result(result)
-    }
-
-    fn request_body(&self, events: Vec<Event>) -> String {
-        let events_as_json : Vec<String> = events.iter().map(|e| {
-            format!(r#"{{
-                      "eventType": "{}",
-                      "eventId": "{}",
-                      "data": {}
-                    }}"#,
-                    e.event_type.to_string(),
-                    e.event_id.hyphenated().to_string(),
-                    e.data.clone().unwrap()) //TODO Eliminate `clone` and deal with `unwrap`.
-        }).collect::<_>();
-
-        format!("[{}]", events_as_json.join(","))
-    }
-
-    fn build_headers(&self, expected_version: ExpectedVersion) -> Headers {
-        let mut headers = Headers::new();
-        headers.set(
-            ContentType(Mime(TopLevel::Application, SubLevel::Ext("vnd.eventstore.events+json".to_owned()), vec![]))
-        );
-        headers.set(ESExpectedVersion(expected_version.into()));
-
-        headers
+        to_hes_result(result)
     }
 
     fn url(&self, stream_name: &str) -> String {
@@ -69,78 +45,81 @@ impl<'a> Appender<'a> {
                 self.connection_info.port,
                 stream_name)
     }
+}
 
-    //TODO Find better name. `handle_...` supposes no return value.
-    fn handle_result(&self, result: HyperResult<HyperResponse>) -> Result<()> {
-        match result {
-            Ok(response) => {
-                match response.status {
-                    StatusCode::Created => Ok(()),
-                    StatusCode::BadRequest => self.handle_bad_request(response),
-                    StatusCode::Gone => self.handle_gone(response),
-                    _ => Err(HesError::UserError(UserErrorKind::UnexpectedResponse(response)))
-                }
-            },
-            Err(err) => Err(HesError::UserError(UserErrorKind::Http(err)))
-        }
+fn build_headers(expected_version: ExpectedVersion) -> Headers {
+    let mut headers = Headers::new();
+    headers.set(
+        ContentType(Mime(TopLevel::Application, SubLevel::Ext("vnd.eventstore.events+json".to_owned()), vec![]))
+    );
+    headers.set(ESExpectedVersion(expected_version.into()));
+
+    headers
+}
+
+fn request_body(events: Vec<Event>) -> String {
+    let events_as_json: Vec<String> = events.iter().map(|e| {
+        format!(r#"{{
+                      "eventType": "{}",
+                      "eventId": "{}",
+                      "data": {}
+                    }}"#,
+                e.event_type.to_string(),
+                e.event_id.hyphenated().to_string(),
+                e.data.clone().unwrap()) //TODO Eliminate `clone` and deal with `unwrap`.
+    }).collect::<_>();
+
+    format!("[{}]", events_as_json.join(","))
+}
+
+fn to_hes_result(result: HyperResult<HyperResponse>) -> Result<()> {
+    match result {
+        Ok(response) => {
+            match response.status {
+                StatusCode::Created => Ok(()),
+                _ => stream_deleted_error(response)
+                    .and_then(event_number_mismatch_error)
+                    .map_err(|kind| HesError::UserError(kind))
+                    .and_then(default_error)
+            }
+        },
+        Err(err) => Err(HesError::UserError(UserErrorKind::Http(err)))
     }
+}
 
-    fn handle_bad_request(&self, response: HyperResponse) -> Result<()> {
-        // RawStatus(400, ref reason_phrase) => {
-        //   Response { status: BadRequest, headers:
-        //     Headers { Access-Control-Allow-Headers: Content-Type, X-Requested-With,
-        //               X-Forwarded-Host, X-PINGOTHER, Authorization, ES-LongPoll,
-        //               ES-ExpectedVersion, ES-EventId, ES-EventType, ES-RequiresMaster,
-        //               ES-HardDelete, ES-ResolveLinkTo,
-        //               Content-Type: text/plain; charset=utf-8,
-        //               Content-Length: 0,
-        //               Date: Wed, 12 Oct 2016 16:24:28 GMT,
-        //               Connection: close,
-        //               Access-Control-Allow-Origin: *,
-        // -->           ES-CurrentVersion: -1,
-        //               Access-Control-Expose-Headers: Location, ES-Position, ES-CurrentVersion,
-        //               Access-Control-Allow-Methods: POST, DELETE, GET, OPTIONS, Server: Mono-HTTPAPI/1.0, },
-        //     version: Http11,
-        //     url: "http://127.0.0.1:2113/streams/task-c0340f57a914468ea6b48f7dff3519dc",
-        // --> status_raw: RawStatus(400, "Wrong expected EventNumber"),
-        //     message: Http11Message { is_proxied: false, method: None, stream: Wrapper { obj: Some(Reading(SizedReader(remaining=0))) } } }
-        let is_wrong_expected_number = { response.status_raw().1 == WRONG_EXPECTED_EVENT_NUMBER };
-
-        let error_kind = if is_wrong_expected_number {
-            let version = self.expected_version(&response);
-            UserErrorKind::EventNumberMismatch(version)
-        } else {
-            UserErrorKind::BadRequest(response)
-        };
-
-        Err(HesError::UserError(error_kind))
+fn stream_deleted_error(response: HyperResponse) -> StdResult<HyperResponse, UserErrorKind> {
+    match response.status {
+        StatusCode::Gone => {
+            if { response.status_raw().1 == STREAM_DELETED } {
+                Err(UserErrorKind::StreamDeleted)
+            } else {
+                Err(UserErrorKind::UnexpectedResponse(response))
+            }
+        },
+        _ => Ok(response)
     }
+}
 
-    fn handle_gone(&self, response: HyperResponse) -> Result<()> {
-        //      Ok(Response { status: Gone, headers: Headers { Content-Type: text/plain; charset=utf-8,
-        //      Access-Control-Allow-Origin: *, Access-Control-Expose-Headers: Location, ES-Position, ES-CurrentVersion,
-        //      Server: Mono-HTTPAPI/1.0, Content-Length: 0, Date: Fri, 28 Oct 2016 06:56:54 GMT,
-        //      Access-Control-Allow-Headers: Content-Type, X-Requested-With,
-        //      X-Forwarded-Host, X-PINGOTHER, Authorization, ES-LongPoll, ES-ExpectedVersion,
-        //      ES-EventId, ES-EventType, ES-RequiresMaster, ES-HardDelete,
-        //      ES-ResolveLinkTo, Access-Control-Allow-Methods: POST, DELETE, GET, OPTIONS, Keep-Alive: timeout=15,max=100, },
-        //      version: Http11, url: "http://127.0.0.1:2113/streams/task-72da3c69876d4dbebca1eb2ae0f6e208",
-        // -->  status_raw: RawStatus(410, "Stream deleted"),
-        //      message: Http11Message { is_proxied: false, method: None,
-        //      stream: Wrapper { obj: Some(Reading(SizedReader(remaining=0))) } } })
-        let is_deleted = { response.status_raw().1 == STREAM_DELETED };
-
-        let error_kind = if is_deleted {
-            UserErrorKind::StreamDeleted
-        } else {
-            UserErrorKind::UnexpectedResponse(response)
-        };
-
-        Err(HesError::UserError(error_kind))
+fn event_number_mismatch_error(response: HyperResponse) -> StdResult<HyperResponse, UserErrorKind> {
+    match response.status {
+        StatusCode::BadRequest => {
+            if { response.status_raw().1 == WRONG_EXPECTED_EVENT_NUMBER } {
+                let version = expected_version(&response);
+                Err(UserErrorKind::EventNumberMismatch(version))
+            } else {
+                Err(UserErrorKind::BadRequest(response))
+            }
+        },
+        _ => Ok(response)
     }
+}
 
-    fn expected_version(&self, response: &HyperResponse) -> Option<ExpectedVersion> {
-        response.headers.get::<ESCurrentVersion>()
-            .and_then(|header| Some(ExpectedVersion::from(header.to_string())))
-    }
+fn default_error(response: HyperResponse) -> Result<()> {
+    Err(HesError::UserError(UserErrorKind::UnexpectedResponse(response)))
+}
+
+fn expected_version(response: &HyperResponse) -> Option<ExpectedVersion> {
+    response.headers
+        .get::<ESCurrentVersion>()
+        .and_then(|header| Some(ExpectedVersion::from(header.to_string())))
 }
