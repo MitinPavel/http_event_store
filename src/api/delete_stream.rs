@@ -21,8 +21,15 @@ impl<'a> Deleter<'a> {
         Deleter { connection_info: connection_info }
     }
 
-    //TODO Get rid of `is_hard: bool` introducing `hard_delete` function.
-    pub fn delete(&self, stream_name: &str, is_hard: bool) -> Result<()> {
+    pub fn delete(&self, stream_name: &str) -> Result<()> {
+        self.do_delete(stream_name, false)
+    }
+
+    pub fn hard_delete(&self, stream_name: &str) -> Result<()> {
+        self.do_delete(stream_name, true)
+    }
+
+    fn do_delete(&self, stream_name: &str, is_hard: bool) -> Result<()> {
         let client = Client::default();
 
         let result = client.delete(&self.url(stream_name))

@@ -38,11 +38,11 @@ impl Client {
 
     pub fn delete_stream(&self, stream_name: &str) -> Result<()> {
         let deleter = Deleter::new(&self.connection_info);
-        deleter.delete(stream_name, false)
+        deleter.delete(stream_name)
     }
 
     pub fn hard_delete_stream(&self, stream_name: &str) -> Result<()> {
         let deleter = Deleter::new(&self.connection_info);
-        deleter.delete(stream_name, true)
+        deleter.hard_delete(stream_name)
     }
 }
