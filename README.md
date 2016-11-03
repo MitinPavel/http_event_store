@@ -3,7 +3,7 @@ Environment
 
 ```
 $ uname -a
-Linux blah 4.2.0-42-generic #49-Ubuntu SMP Tue Jun 28 21:26:26 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+Linux blah 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
 
 $ rustc --version
 rustc 1.10.0 (cfcb716cf 2016-07-03)
@@ -21,7 +21,6 @@ TODO
 ====
 
 * Find MAX value for `Expected Version`.
-* Create more tests for api::append_to_stream::Appender getting inspiration from https://github.com/EventStore/EventStore/blob/08c2bdf7dcadd154cffa549d273e3a8e4673c5a1/src/EventStore.Core.Tests/Http/Streams/append_to_stream.cs
 
 TBD
 ===
