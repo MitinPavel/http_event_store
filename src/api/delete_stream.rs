@@ -33,31 +33,10 @@ impl<'a> Deleter<'a> {
         let client = Client::default();
 
         let result = client.delete(&self.url(stream_name))
-            .headers(self.build_headers(is_hard))
+            .headers(build_headers(is_hard))
             .send();
 
-        self.handle_result(result)
-    }
-
-    fn build_headers(&self, is_hard: bool) -> Headers {
-        let mut headers = Headers::new();
-        headers.set(ESExpectedVersion(ExpectedVersion::Any.into()));
-        headers.set(ESHardDelete(is_hard));
-
-        headers
-    }
-
-    //TODO Handle Stream Already Deleted
-    fn handle_result(&self, result: HyperResult<HyperResponse>) -> Result<()> {
-        match result {
-            Ok(response) => {
-                match response.status {
-                    StatusCode::NoContent => Ok(()),
-                    _ => Err(HesError::UserError(UserErrorKind::UnexpectedResponse(response)))
-                }
-            },
-            Err(err) => Err(HesError::UserError(UserErrorKind::Http(err)))
-        }
+        to_hes_result(result)
     }
 
     fn url(&self, stream_name: &str) -> String {
@@ -65,5 +44,26 @@ impl<'a> Deleter<'a> {
                 self.connection_info.host,
                 self.connection_info.port,
                 stream_name)
+    }
+}
+
+fn build_headers(is_hard: bool) -> Headers {
+    let mut headers = Headers::new();
+    headers.set(ESExpectedVersion(ExpectedVersion::Any.into()));
+    headers.set(ESHardDelete(is_hard));
+
+    headers
+}
+
+//TODO Handle Stream Already Deleted
+fn to_hes_result(result: HyperResult<HyperResponse>) -> Result<()> {
+    match result {
+        Ok(response) => {
+            match response.status {
+                StatusCode::NoContent => Ok(()),
+                _ => Err(HesError::UserError(UserErrorKind::UnexpectedResponse(response)))
+            }
+        },
+        Err(err) => Err(HesError::UserError(UserErrorKind::Http(err)))
     }
 }
