@@ -44,6 +44,9 @@ impl Reader {
             StatusCode::NotFound => {
                 Err(HesError::UserError(UserErrorKind::StreamNotFound))
             },
+            StatusCode::Gone => {
+                Err(HesError::UserError(UserErrorKind::StreamDeleted))
+            },
             _ => {
                 self.panic_showing(&response)
             }
