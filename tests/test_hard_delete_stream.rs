@@ -16,7 +16,7 @@ use hes::error::HesError::*;
 use hes::error::UserErrorKind::*;
 
 #[test]
-fn should_delete_stream() {
+fn should_hard_delete_stream() {
     let events: Vec<Event> = vec![TaskCreated { name: "Created".to_string(), event_id: uuid::Uuid::new_v4() }.into()];
 
     let client = Client::default();
@@ -24,9 +24,9 @@ fn should_delete_stream() {
 
     client.append_to_stream(&stream_name, ExpectedVersion::NoStream, events).unwrap();
     assert!(client.read_stream_events_forward(&stream_name, 0, 1, true).is_ok());
-    assert!(client.delete_stream(&stream_name, ExpectedVersion::Any).is_ok());
+    assert!(client.hard_delete_stream(&stream_name, ExpectedVersion::Any).is_ok());
     let result = client.read_stream_events_forward(&stream_name, 0, 1, true);
-    assert_error!(UserError, StreamNotFound, result.unwrap_err());
+    assert_error!(UserError, StreamDeleted, result.unwrap_err());
 }
 
 #[test]
@@ -37,7 +37,7 @@ fn should_fail_if_expected_version_is_not_correct() {
     let stream_name = test_stream_name();
 
     client.append_to_stream(&stream_name, ExpectedVersion::NoStream, events).unwrap();
-    let result = client.delete_stream(&stream_name, ExpectedVersion::NoStream);
+    let result = client.hard_delete_stream(&stream_name, ExpectedVersion::NoStream);
     assert_error!(UserError, EventNumberMismatch(..), result.unwrap_err());
 }
 

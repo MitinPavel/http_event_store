@@ -11,6 +11,9 @@ use connection::ConnectionInfo;
 use expected_version::ExpectedVersion;
 use api::ESExpectedVersion;
 use api::ESHardDelete;
+use api::ESCurrentVersion;
+
+const WRONG_EXPECTED_EVENT_NUMBER: &'static str = "Wrong expected EventNumber";
 
 pub struct Deleter<'a> {
    connection_info: &'a ConnectionInfo,
@@ -21,19 +24,19 @@ impl<'a> Deleter<'a> {
         Deleter { connection_info: connection_info }
     }
 
-    pub fn delete(&self, stream_name: &str) -> Result<()> {
-        self.do_delete(stream_name, false)
+    pub fn delete(&self, stream_name: &str, expected_version: ExpectedVersion) -> Result<()> {
+        self.do_delete(stream_name, expected_version, false)
     }
 
-    pub fn hard_delete(&self, stream_name: &str) -> Result<()> {
-        self.do_delete(stream_name, true)
+    pub fn hard_delete(&self, stream_name: &str, expected_version: ExpectedVersion) -> Result<()> {
+        self.do_delete(stream_name, expected_version, true)
     }
 
-    fn do_delete(&self, stream_name: &str, is_hard: bool) -> Result<()> {
+    fn do_delete(&self, stream_name: &str, expected_version: ExpectedVersion, is_hard: bool) -> Result<()> {
         let client = Client::default();
 
         let result = client.delete(&self.url(stream_name))
-            .headers(build_headers(is_hard))
+            .headers(build_headers(expected_version, is_hard))
             .send();
 
         to_hes_result(result)
@@ -47,23 +50,45 @@ impl<'a> Deleter<'a> {
     }
 }
 
-fn build_headers(is_hard: bool) -> Headers {
+fn build_headers(expected_version: ExpectedVersion, is_hard: bool) -> Headers {
     let mut headers = Headers::new();
-    headers.set(ESExpectedVersion(ExpectedVersion::Any.into()));
+    headers.set(ESExpectedVersion(expected_version.into()));
     headers.set(ESHardDelete(is_hard));
 
     headers
 }
 
-//TODO Handle Stream Already Deleted
 fn to_hes_result(result: HyperResult<HyperResponse>) -> Result<()> {
     match result {
         Ok(response) => {
             match response.status {
                 StatusCode::NoContent => Ok(()),
+                StatusCode::BadRequest => event_number_mismatch_error(response),
+                StatusCode::Gone => Err(HesError::UserError(UserErrorKind::StreamDeleted)),
                 _ => Err(HesError::UserError(UserErrorKind::UnexpectedResponse(response)))
             }
         },
         Err(err) => Err(HesError::UserError(UserErrorKind::Http(err)))
     }
+}
+
+fn event_number_mismatch_error(response: HyperResponse) -> Result<()> {
+    match response.status {
+        StatusCode::BadRequest => {
+            if { response.status_raw().1 == WRONG_EXPECTED_EVENT_NUMBER } {
+                let version = expected_version(&response);
+                Err(HesError::UserError(UserErrorKind::EventNumberMismatch(version)))
+            } else {
+                Err(HesError::UserError(UserErrorKind::BadRequest(response)))
+            }
+        },
+        _ => Ok(())
+    }
+}
+
+//TODO Get rid of duplication (see append_to_stream.rs).
+fn expected_version(response: &HyperResponse) -> Option<ExpectedVersion> {
+    response.headers
+        .get::<ESCurrentVersion>()
+        .and_then(|header| Some(ExpectedVersion::from(header.to_string())))
 }

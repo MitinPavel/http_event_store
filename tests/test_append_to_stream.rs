@@ -83,14 +83,12 @@ fn should_fail_appending_with_any_expected_version_to_deleted_stream() {
     let stream_name = test_stream_name();
 
     client.append_to_stream(&stream_name, ExpectedVersion::NoStream, vec![task_created_event().into()]).unwrap();
-    client.hard_delete_stream(&stream_name).unwrap();
+    client.hard_delete_stream(&stream_name, ExpectedVersion::Any).unwrap();
 
     let result = client.append_to_stream(&stream_name, ExpectedVersion::Any, vec![task_renamed_event().into()]);
 
     assert_error!(UserError, StreamDeleted, result.unwrap_err());
 }
-
-//183
 
 fn test_stream_name() -> String {
     format!("task-{}", uuid::Uuid::new_v4().simple())

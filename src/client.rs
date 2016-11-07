@@ -36,13 +36,13 @@ impl Client {
         reader.read_stream_events_forward(stream_name, start, count, resolve_link_tos)
     }
 
-    pub fn delete_stream(&self, stream_name: &str) -> Result<()> {
+    pub fn delete_stream(&self, stream_name: &str, expected_version: ExpectedVersion) -> Result<()> {
         let deleter = Deleter::new(&self.connection_info);
-        deleter.delete(stream_name)
+        deleter.delete(stream_name, expected_version)
     }
 
-    pub fn hard_delete_stream(&self, stream_name: &str) -> Result<()> {
+    pub fn hard_delete_stream(&self, stream_name: &str, expected_version: ExpectedVersion) -> Result<()> {
         let deleter = Deleter::new(&self.connection_info);
-        deleter.hard_delete(stream_name)
+        deleter.hard_delete(stream_name, expected_version)
     }
 }
