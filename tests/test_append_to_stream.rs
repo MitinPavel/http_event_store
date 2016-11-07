@@ -68,7 +68,7 @@ fn should_return_bad_request_error_if_event_data_is_malformed() {
     let stream_name = test_stream_name();
 
     let malformed_event = hes::event::Event {
-        event_id: uuid::Uuid::new_v4(),
+        event_id: Some(uuid::Uuid::new_v4()),
         event_type: "task-created".to_string(),
         data: Some("?-/*".to_string())
     };

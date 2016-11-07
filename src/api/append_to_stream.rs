@@ -61,7 +61,7 @@ fn request_body(events: Vec<Event>) -> String {
                       "data": {}
                     }}"#,
                 e.event_type.to_string(),
-                e.event_id.hyphenated().to_string(),
+                e.event_id.unwrap().hyphenated().to_string(), //TODO Eliminate `unwrap`.
                 e.data.clone().unwrap()) //TODO Eliminate `clone` and deal with `unwrap`.
     }).collect::<_>();
 
