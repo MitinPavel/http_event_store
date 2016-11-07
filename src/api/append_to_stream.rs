@@ -55,14 +55,21 @@ fn build_headers(expected_version: ExpectedVersion) -> Headers {
 
 fn request_body(events: Vec<Event>) -> String {
     let events_as_json: Vec<String> = events.iter().map(|e| {
-        format!(r#"{{
-                      "eventType": "{}",
-                      "eventId": "{}",
-                      "data": {}
-                    }}"#,
-                e.event_type.to_string(),
-                e.event_id.unwrap().hyphenated().to_string(), //TODO Eliminate `unwrap`.
-                e.data.clone().unwrap()) //TODO Eliminate `clone` and deal with `unwrap`.
+        let mut result: String = format!(r#"{{"eventType":"{}""#, e.event_type);
+
+        if let Some(id) = e.event_id {
+            let id_pair = &format!(r#","eventId":"{}""#, id);
+            result.push_str(id_pair)
+        }
+
+        if let Some(ref data) = e.data {
+            let data_pair = &format!(r#","data":{}"#, data);
+            result.push_str(data_pair)
+        }
+
+        result.push_str(r#"}"#);
+
+        result
     }).collect::<_>();
 
     format!("[{}]", events_as_json.join(","))
