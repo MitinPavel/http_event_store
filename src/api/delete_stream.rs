@@ -11,9 +11,7 @@ use connection::ConnectionInfo;
 use expected_version::ExpectedVersion;
 use api::ESExpectedVersion;
 use api::ESHardDelete;
-use api::ESCurrentVersion;
-
-const WRONG_EXPECTED_EVENT_NUMBER: &'static str = "Wrong expected EventNumber";
+use api::to_error::*;
 
 pub struct Deleter<'a> {
    connection_info: &'a ConnectionInfo,
@@ -63,32 +61,12 @@ fn to_hes_result(result: HyperResult<HyperResponse>) -> Result<()> {
         Ok(response) => {
             match response.status {
                 StatusCode::NoContent => Ok(()),
-                StatusCode::BadRequest => event_number_mismatch_error(response),
-                StatusCode::Gone => Err(HesError::UserError(UserErrorKind::StreamDeleted)),
-                _ => Err(HesError::UserError(UserErrorKind::UnexpectedResponse(response)))
+                _ => stream_deleted_error(response)
+                    .and_then(event_number_mismatch_error)
+                    .map_err(|kind| HesError::UserError(kind))
+                    .and_then(default_error)
             }
         },
         Err(err) => Err(HesError::UserError(UserErrorKind::Http(err)))
     }
-}
-
-fn event_number_mismatch_error(response: HyperResponse) -> Result<()> {
-    match response.status {
-        StatusCode::BadRequest => {
-            if { response.status_raw().1 == WRONG_EXPECTED_EVENT_NUMBER } {
-                let version = expected_version(&response);
-                Err(HesError::UserError(UserErrorKind::EventNumberMismatch(version)))
-            } else {
-                Err(HesError::UserError(UserErrorKind::BadRequest(response)))
-            }
-        },
-        _ => Ok(())
-    }
-}
-
-//TODO Get rid of duplication (see append_to_stream.rs).
-fn expected_version(response: &HyperResponse) -> Option<ExpectedVersion> {
-    response.headers
-        .get::<ESCurrentVersion>()
-        .and_then(|header| Some(ExpectedVersion::from(header.to_string())))
 }

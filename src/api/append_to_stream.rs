@@ -1,4 +1,3 @@
-use std::result::Result as StdResult;
 use hyper::Client;
 use hyper::Result as HyperResult;
 use hyper::client::Response as HyperResponse;
@@ -13,11 +12,8 @@ use error::HesError;
 use error::UserErrorKind;
 use connection::ConnectionInfo;
 
-use api::ESCurrentVersion;
 use api::ESExpectedVersion;
-
-const WRONG_EXPECTED_EVENT_NUMBER: &'static str = "Wrong expected EventNumber";
-const STREAM_DELETED: &'static str = "Stream deleted";
+use api::to_error::*;
 
 pub struct Appender<'a> {
     connection_info: &'a ConnectionInfo,
@@ -85,41 +81,4 @@ fn to_hes_result(result: HyperResult<HyperResponse>) -> Result<()> {
         },
         Err(err) => Err(HesError::UserError(UserErrorKind::Http(err)))
     }
-}
-
-fn stream_deleted_error(response: HyperResponse) -> StdResult<HyperResponse, UserErrorKind> {
-    match response.status {
-        StatusCode::Gone => {
-            if { response.status_raw().1 == STREAM_DELETED } {
-                Err(UserErrorKind::StreamDeleted)
-            } else {
-                Err(UserErrorKind::UnexpectedResponse(response))
-            }
-        },
-        _ => Ok(response)
-    }
-}
-
-fn event_number_mismatch_error(response: HyperResponse) -> StdResult<HyperResponse, UserErrorKind> {
-    match response.status {
-        StatusCode::BadRequest => {
-            if { response.status_raw().1 == WRONG_EXPECTED_EVENT_NUMBER } {
-                let version = expected_version(&response);
-                Err(UserErrorKind::EventNumberMismatch(version))
-            } else {
-                Err(UserErrorKind::BadRequest(response))
-            }
-        },
-        _ => Ok(response)
-    }
-}
-
-fn default_error(response: HyperResponse) -> Result<()> {
-    Err(HesError::UserError(UserErrorKind::UnexpectedResponse(response)))
-}
-
-fn expected_version(response: &HyperResponse) -> Option<ExpectedVersion> {
-    response.headers
-        .get::<ESCurrentVersion>()
-        .and_then(|header| Some(ExpectedVersion::from(header.to_string())))
 }
