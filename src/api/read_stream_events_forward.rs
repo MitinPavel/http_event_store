@@ -10,14 +10,18 @@ use Stream;
 use types::Result;
 use error::HesError;
 use error::UserErrorKind;
-
+use connection::ConnectionInfo;
 use api::ESResolveLinkTos;
 
-pub struct Reader {
+pub struct Reader<'a> {
     connection_info: &'a ConnectionInfo,
 }
 
-impl Reader {
+impl<'a> Reader<'a> {
+    pub fn new(connection_info: &'a ConnectionInfo) -> Reader {
+        Reader { connection_info: connection_info }
+    }
+
     pub fn read_stream_events_forward(&self, stream_name: &str, start: u32, count: u32, resolve_link_tos: bool) -> Result<Stream> {
         let http_client = Client::default();
 
@@ -28,12 +32,7 @@ impl Reader {
                    SubLevel::Ext("vnd.eventstore.atom+json".to_owned()), vec![]))]));
         headers.set(ESResolveLinkTos(resolve_link_tos));
 
-        let url = format!("http://127.0.0.1:2113/streams/{}/{}/forward/{}?embed=body",
-                          stream_name,
-                          start,
-                          count);
-
-        let mut response = try!(http_client.get(&url)
+        let mut response = try!(http_client.get(&self.url(stream_name, start, count))
             .headers(headers)
             .send());
         match response.status {
@@ -53,6 +52,15 @@ impl Reader {
                 self.panic_showing(&response)
             }
         }
+    }
+
+    fn url(&self, stream_name: &str, start: u32, count: u32) -> String {
+        format!("http://{}:{}/streams/{}/{}/forward/{}?embed=body",
+                self.connection_info.host,
+                self.connection_info.port,
+                stream_name,
+                start,
+                count)
     }
 
     //TODO Duplication with StramAppender

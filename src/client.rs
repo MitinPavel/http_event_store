@@ -38,7 +38,7 @@ impl Client {
 
     //TODO Restrict `count` using u8 or u16
     pub fn read_stream_events_forward(&self, stream_name: &str, start: u32, count: u32, resolve_link_tos: bool) -> Result<Stream> {
-        let reader = Reader {};
+        let reader = Reader::new(&self.connection_info);
         reader.read_stream_events_forward(stream_name, start, count, resolve_link_tos)
     }
 
