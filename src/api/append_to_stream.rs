@@ -27,8 +27,8 @@ impl<'a> Appender<'a> {
     pub fn append<I>(&self, stream_name: &str,
                   expected_version: ExpectedVersion,
                   events: I) -> Result<()>
-        where I: IntoIterator<Item = Event>
-    {
+        where I: IntoIterator<Item = Event> {
+
         let http_client = Client::default();
 
         let result = http_client.post(&self.url(stream_name))

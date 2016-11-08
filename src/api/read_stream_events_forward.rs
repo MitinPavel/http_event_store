@@ -13,7 +13,9 @@ use error::UserErrorKind;
 
 use api::ESResolveLinkTos;
 
-pub struct Reader {}
+pub struct Reader {
+    connection_info: &'a ConnectionInfo,
+}
 
 impl Reader {
     pub fn read_stream_events_forward(&self, stream_name: &str, start: u32, count: u32, resolve_link_tos: bool) -> Result<Stream> {

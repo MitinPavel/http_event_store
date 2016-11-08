@@ -30,8 +30,8 @@ impl Client {
                                expected_version: ExpectedVersion,
                                events: I)
                                -> Result<()>
-        where I: IntoIterator<Item = Event>
-    {
+        where I: IntoIterator<Item = Event> {
+
         let appender = Appender::new(&self.connection_info);
         appender.append(stream_name, expected_version, events)
     }
