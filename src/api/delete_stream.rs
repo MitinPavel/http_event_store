@@ -14,7 +14,7 @@ use api::ESHardDelete;
 use api::to_error::*;
 
 pub struct Deleter<'a> {
-   connection_info: &'a ConnectionInfo,
+    connection_info: &'a ConnectionInfo,
 }
 
 impl<'a> Deleter<'a> {
@@ -30,7 +30,11 @@ impl<'a> Deleter<'a> {
         self.do_delete(stream_name, expected_version, true)
     }
 
-    fn do_delete(&self, stream_name: &str, expected_version: ExpectedVersion, is_hard: bool) -> Result<()> {
+    fn do_delete(&self,
+                 stream_name: &str,
+                 expected_version: ExpectedVersion,
+                 is_hard: bool)
+                 -> Result<()> {
         let http_client = Client::default();
 
         let result = http_client.delete(&self.url(stream_name))

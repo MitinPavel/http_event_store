@@ -28,7 +28,8 @@ pub fn stream_deleted_error(response: HyperResponse) -> StdResult<HyperResponse,
     }
 }
 
-pub fn event_number_mismatch_error(response: HyperResponse) -> StdResult<HyperResponse, UserErrorKind> {
+pub fn event_number_mismatch_error(response: HyperResponse)
+                                   -> StdResult<HyperResponse, UserErrorKind> {
     match response.status {
         StatusCode::BadRequest => {
             if { response.status_raw().1 == WRONG_EXPECTED_EVENT_NUMBER } {

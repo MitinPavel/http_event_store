@@ -1,10 +1,10 @@
 #[derive(Debug)]
 pub enum ExpectedVersion {
     Number(u64),
-    Empty,       //  0 states that the stream should exist but should be empty.
-    NoStream,    // -1 states that the stream should not exist at the time of the writing (this write will create it).
-    Any,         // -2 states that this write should never conflict with anything and should always succeed.
-    Exist,       // -4 to say that the stream should exist with any number of events in it.
+    Empty,       // The stream should exist but should be empty.
+    NoStream,    // The stream should not exist at the time of the writing.
+    Any,         // This write should never conflict with anything and should always succeed.
+    Exist,       // The stream should exist with any number of events in it.
 
     Unexpected(String) // Any string (including -3 OR less than or equal -5).
 }

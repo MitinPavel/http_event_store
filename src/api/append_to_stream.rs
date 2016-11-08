@@ -25,10 +25,9 @@ impl<'a> Appender<'a> {
     }
 
     pub fn append<I>(&self, stream_name: &str,
-                  expected_version: ExpectedVersion,
-                  events: I) -> Result<()>
+                     expected_version: ExpectedVersion,
+                     events: I) -> Result<()>
         where I: IntoIterator<Item = Event> {
-
         let http_client = Client::default();
 
         let result = http_client.post(&self.url(stream_name))
@@ -50,7 +49,8 @@ impl<'a> Appender<'a> {
 fn build_headers(expected_version: ExpectedVersion) -> Headers {
     let mut headers = Headers::new();
     headers.set(
-        ContentType(Mime(TopLevel::Application, SubLevel::Ext("vnd.eventstore.events+json".to_owned()), vec![]))
+        ContentType(Mime(TopLevel::Application,
+                         SubLevel::Ext("vnd.eventstore.events+json".to_owned()), vec![]))
     );
     headers.set(ESExpectedVersion(expected_version.into()));
 
