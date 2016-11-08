@@ -25,7 +25,13 @@ impl Client {
         }
     }
 
-    pub fn append_to_stream(&self, stream_name: &str, expected_version: ExpectedVersion, events: Vec<Event>) -> Result<()> {
+    pub fn append_to_stream<I>(&self,
+                               stream_name: &str,
+                               expected_version: ExpectedVersion,
+                               events: I)
+                               -> Result<()>
+        where I: IntoIterator<Item = Event>
+    {
         let appender = Appender::new(&self.connection_info);
         appender.append(stream_name, expected_version, events)
     }

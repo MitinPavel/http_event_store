@@ -24,7 +24,11 @@ impl<'a> Appender<'a> {
         Appender { connection_info: connection_info }
     }
 
-    pub fn append(&self, stream_name: &str, expected_version: ExpectedVersion, events: Vec<Event>) -> Result<()> {
+    pub fn append<I>(&self, stream_name: &str,
+                  expected_version: ExpectedVersion,
+                  events: I) -> Result<()>
+        where I: IntoIterator<Item = Event>
+    {
         let client = Client::default();
 
         let result = client.post(&self.url(stream_name))
@@ -53,8 +57,8 @@ fn build_headers(expected_version: ExpectedVersion) -> Headers {
     headers
 }
 
-fn request_body(events: Vec<Event>) -> String {
-    let events_as_json: Vec<String> = events.iter().map(|e| {
+fn request_body<I>(events: I) -> String where I: IntoIterator<Item = Event> {
+    let events_as_json: Vec<String> = events.into_iter().map(|e| {
         let mut result: String = format!(r#"{{"eventType":"{}""#, e.event_type);
 
         if let Some(id) = e.event_id {
