@@ -29,9 +29,9 @@ impl<'a> Appender<'a> {
                   events: I) -> Result<()>
         where I: IntoIterator<Item = Event>
     {
-        let client = Client::default();
+        let http_client = Client::default();
 
-        let result = client.post(&self.url(stream_name))
+        let result = http_client.post(&self.url(stream_name))
             .headers(build_headers(expected_version))
             .body(&request_body(events))
             .send();

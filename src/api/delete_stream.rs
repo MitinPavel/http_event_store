@@ -31,9 +31,9 @@ impl<'a> Deleter<'a> {
     }
 
     fn do_delete(&self, stream_name: &str, expected_version: ExpectedVersion, is_hard: bool) -> Result<()> {
-        let client = Client::default();
+        let http_client = Client::default();
 
-        let result = client.delete(&self.url(stream_name))
+        let result = http_client.delete(&self.url(stream_name))
             .headers(build_headers(expected_version, is_hard))
             .send();
 

@@ -17,7 +17,7 @@ pub struct Reader {}
 
 impl Reader {
     pub fn read_stream_events_forward(&self, stream_name: &str, start: u32, count: u32, resolve_link_tos: bool) -> Result<Stream> {
-        let client = Client::default();
+        let http_client = Client::default();
 
         let mut headers = Headers::new();
         headers.set(
@@ -31,7 +31,7 @@ impl Reader {
                           start,
                           count);
 
-        let mut response = try!(client.get(&url)
+        let mut response = try!(http_client.get(&url)
             .headers(headers)
             .send());
         match response.status {
