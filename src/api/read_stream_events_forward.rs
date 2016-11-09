@@ -43,7 +43,7 @@ impl<'a> Reader<'a> {
         match response.status {
             StatusCode::Ok => {
                 let mut body = String::new();
-                response.read_to_string(&mut body).unwrap(); //TODO Handle Result.
+                try!(response.read_to_string(&mut body));
                 let stream: Stream = serde_json::from_str(&body).unwrap();
                 Ok(stream)
             },
