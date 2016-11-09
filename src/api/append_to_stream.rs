@@ -1,5 +1,4 @@
 use hyper::Client;
-use hyper::Result as HyperResult;
 use hyper::client::Response as HyperResponse;
 use hyper::header::{Headers, ContentType};
 use hyper::mime::{Mime, TopLevel, SubLevel};
@@ -9,7 +8,6 @@ use event::Event;
 use types::Result;
 use expected_version::ExpectedVersion;
 use error::HesError;
-use error::UserErrorKind;
 use connection::ConnectionInfo;
 
 use api::ESExpectedVersion;
@@ -30,12 +28,12 @@ impl<'a> Appender<'a> {
         where I: IntoIterator<Item = Event> {
         let http_client = Client::default();
 
-        let result = http_client.post(&self.url(stream_name))
+        let response = try!(http_client.post(&self.url(stream_name))
             .headers(build_headers(expected_version))
             .body(&request_body(events))
-            .send();
+            .send());
 
-        to_hes_result(result)
+        to_hes_result(response)
     }
 
     fn url(&self, stream_name: &str) -> String {
@@ -79,17 +77,12 @@ fn request_body<I>(events: I) -> String where I: IntoIterator<Item = Event> {
     format!("[{}]", events_as_json.join(","))
 }
 
-fn to_hes_result(result: HyperResult<HyperResponse>) -> Result<()> {
-    match result {
-        Ok(response) => {
-            match response.status {
-                StatusCode::Created => Ok(()),
-                _ => stream_deleted_error(response)
-                    .and_then(event_number_mismatch_error)
-                    .map_err(|kind| HesError::UserError(kind))
-                    .and_then(default_error)
-            }
-        },
-        Err(err) => Err(HesError::UserError(UserErrorKind::Http(err)))
+fn to_hes_result(response: HyperResponse) -> Result<()> {
+    match response.status {
+        StatusCode::Created => Ok(()),
+        _ => stream_deleted_error(response)
+            .and_then(event_number_mismatch_error)
+            .map_err(|kind| HesError::UserError(kind))
+            .and_then(default_error)
     }
 }
