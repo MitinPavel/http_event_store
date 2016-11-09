@@ -29,7 +29,6 @@ fn should_retrun_stream_deleted_error_attempting_to_read_deleted_stream() {
     let stream_name = format!("stream-{}", uuid::Uuid::new_v4().simple());
     client.append_to_stream(&stream_name, ExpectedVersion::NoStream, events).unwrap();
 
-    println!("{:?}", client.read_stream_events_forward(&stream_name, 0, 1, true).is_ok());
     assert!(client.read_stream_events_forward(&stream_name, 0, 1, true).is_ok());
     assert!(client.hard_delete_stream(&stream_name, ExpectedVersion::Any).is_ok());
 
