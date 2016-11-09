@@ -1,4 +1,5 @@
 use hyper;
+use serde_json;
 use std::io;
 use expected_version::ExpectedVersion;
 
@@ -21,6 +22,7 @@ pub enum UserErrorKind {
 
 #[derive(Debug)]
 pub enum LogicErrorKind {
+    Json(serde_json::Error),
     Io(io::Error),
 }
 
@@ -33,5 +35,11 @@ impl From<hyper::error::Error> for HesError {
 impl From<io::Error> for HesError {
     fn from(err: io::Error) -> HesError {
         HesError::LogicError(LogicErrorKind::Io(err))
+    }
+}
+
+impl From<serde_json::Error> for HesError {
+ fn from(err: serde_json::Error) -> HesError {
+        HesError::LogicError(LogicErrorKind::Json(err))
     }
 }

@@ -44,7 +44,7 @@ impl<'a> Reader<'a> {
             StatusCode::Ok => {
                 let mut body = String::new();
                 try!(response.read_to_string(&mut body));
-                let stream: Stream = serde_json::from_str(&body).unwrap();
+                let stream: Stream = try!(serde_json::from_str(&body));
                 Ok(stream)
             },
             StatusCode::NotFound => {
