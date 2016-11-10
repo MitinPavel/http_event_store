@@ -1,4 +1,5 @@
 use hyper::Client;
+use hyper::client::Response as HyperResponse;
 use hyper::header::{Headers, Accept, qitem};
 use hyper::mime::{Mime, TopLevel, SubLevel};
 use hyper::status::StatusCode;
@@ -36,26 +37,11 @@ impl<'a> Reader<'a> {
                        SubLevel::Ext("vnd.eventstore.atom+json".to_owned()), vec![]))]));
         headers.set(ESResolveLinkTos(resolve_link_tos));
 
-        let mut response = try!(http_client.get(&self.url(stream_name, start, count))
+        let response = try!(http_client.get(&self.url(stream_name, start, count))
             .headers(headers)
             .send());
-        match response.status {
-            StatusCode::Ok => {
-                let mut body = String::new();
-                try!(response.read_to_string(&mut body));
-                let stream: Stream = try!(serde_json::from_str(&body));
-                Ok(stream)
-            },
-            StatusCode::NotFound => {
-                Err(HesError::UserError(UserErrorKind::StreamNotFound))
-            },
-            StatusCode::Gone => {
-                Err(HesError::UserError(UserErrorKind::StreamDeleted))
-            },
-            _ => {
-                Err(HesError::UserError(UserErrorKind::UnexpectedResponse(response)))
-            }
-        }
+
+        to_hes_result(response)
     }
 
     fn url(&self, stream_name: &str, start: u32, count: u32) -> String {
@@ -65,5 +51,25 @@ impl<'a> Reader<'a> {
                 stream_name,
                 start,
                 count)
+    }
+}
+
+fn to_hes_result(mut response: HyperResponse) -> Result<Stream> {
+    match response.status {
+        StatusCode::Ok => {
+            let mut body = String::new();
+            try!(response.read_to_string(&mut body));
+            let stream: Stream = try!(serde_json::from_str(&body));
+            Ok(stream)
+        },
+        StatusCode::NotFound => {
+            Err(HesError::UserError(UserErrorKind::StreamNotFound))
+        },
+        StatusCode::Gone => {
+            Err(HesError::UserError(UserErrorKind::StreamDeleted))
+        },
+        _ => {
+            Err(HesError::UserError(UserErrorKind::UnexpectedResponse(response)))
+        }
     }
 }
