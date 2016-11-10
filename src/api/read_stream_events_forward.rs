@@ -30,15 +30,8 @@ impl<'a> Reader<'a> {
                                       -> Result<Stream> {
         let http_client = Client::default();
 
-        let mut headers = Headers::new();
-        headers.set(
-            Accept(vec![
-            qitem(Mime(TopLevel::Application,
-                       SubLevel::Ext("vnd.eventstore.atom+json".to_owned()), vec![]))]));
-        headers.set(ESResolveLinkTos(resolve_link_tos));
-
         let response = try!(http_client.get(&self.url(stream_name, start, count))
-            .headers(headers)
+            .headers(build_headers(resolve_link_tos))
             .send());
 
         to_hes_result(response)
@@ -52,6 +45,17 @@ impl<'a> Reader<'a> {
                 start,
                 count)
     }
+}
+
+fn build_headers(resolve_link_tos: bool) -> Headers {
+    let mut headers = Headers::new();
+    headers.set(
+        Accept(vec![
+        qitem(Mime(TopLevel::Application,
+                   SubLevel::Ext("vnd.eventstore.atom+json".to_owned()), vec![]))]));
+    headers.set(ESResolveLinkTos(resolve_link_tos));
+
+    headers
 }
 
 fn to_hes_result(mut response: HyperResponse) -> Result<Stream> {
