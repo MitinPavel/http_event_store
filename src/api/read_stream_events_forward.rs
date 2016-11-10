@@ -1,6 +1,5 @@
 use hyper::Client;
 use hyper::header::{Headers, Accept, qitem};
-use hyper::client::Response as HyperResponse;
 use hyper::mime::{Mime, TopLevel, SubLevel};
 use hyper::status::StatusCode;
 use std::io::Read;
@@ -54,7 +53,7 @@ impl<'a> Reader<'a> {
                 Err(HesError::UserError(UserErrorKind::StreamDeleted))
             },
             _ => {
-                self.panic_showing(&response)
+                Err(HesError::UserError(UserErrorKind::UnexpectedResponse(response)))
             }
         }
     }
@@ -66,10 +65,5 @@ impl<'a> Reader<'a> {
                 stream_name,
                 start,
                 count)
-    }
-
-    //TODO Duplication with StramAppender
-    fn panic_showing(&self, response: &HyperResponse) -> ! {
-        panic!("hyper::status::StatusCode {} Response: {:?}", response.status, response)
     }
 }
