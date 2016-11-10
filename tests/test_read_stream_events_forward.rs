@@ -11,7 +11,7 @@ use hes::expected_version::ExpectedVersion;
 mod support;
 
 #[test]
-fn should_retrun_stream_not_found_error_attempting_to_read_nonexistent_stream() {
+fn should_return_stream_not_found_error_attempting_to_read_nonexistent_stream() {
     let client = hes::client::Client::default();
     let nonexistent_stream_name = "some-nonexistent";
     let result = client.read_stream_events_forward(&nonexistent_stream_name, 0, 1, true);
@@ -20,7 +20,7 @@ fn should_retrun_stream_not_found_error_attempting_to_read_nonexistent_stream() 
 }
 
 #[test]
-fn should_retrun_stream_deleted_error_attempting_to_read_deleted_stream() {
+fn should_return_stream_deleted_error_attempting_to_read_deleted_stream() {
     let events: Vec<Event> = vec![Event { event_id: Some(uuid::Uuid::new_v4()),
                                           event_type: "created".to_string(),
                                           data: Some("{a:1}".to_string()) }];
