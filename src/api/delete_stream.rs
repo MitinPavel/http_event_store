@@ -1,4 +1,4 @@
-use hyper::Client;
+use hyper::Client as HyperClient;
 use hyper::client::Response as HyperResponse;
 use hyper::status::StatusCode;
 use hyper::header::Headers;
@@ -13,11 +13,12 @@ use api::to_error::*;
 
 pub struct Deleter<'a> {
     connection_info: &'a ConnectionInfo,
+    http_client: HyperClient,
 }
 
 impl<'a> Deleter<'a> {
-    pub fn new(connection_info: &'a ConnectionInfo) -> Deleter {
-        Deleter { connection_info: connection_info }
+    pub fn new(connection_info: &'a ConnectionInfo, http_client: HyperClient) -> Deleter {
+        Deleter { connection_info: connection_info, http_client: http_client }
     }
 
     pub fn delete(&self, stream_name: &str, expected_version: ExpectedVersion) -> Result<()> {
@@ -33,9 +34,7 @@ impl<'a> Deleter<'a> {
                  expected_version: ExpectedVersion,
                  is_hard: bool)
                  -> Result<()> {
-        let http_client = Client::default();
-
-        let response = try!(http_client.delete(&self.url(stream_name))
+        let response = try!(self.http_client.delete(&self.url(stream_name))
             .headers(build_headers(expected_version, is_hard))
             .send());
 

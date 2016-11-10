@@ -1,3 +1,5 @@
+use hyper::Client as HyperClient;
+
 use api::append_to_stream::Appender;
 use api::read_stream_events_forward::Reader;
 use api::delete_stream::Deleter;
@@ -32,7 +34,8 @@ impl Client {
                                -> Result<()>
         where I: IntoIterator<Item = Event> {
 
-        let appender = Appender::new(&self.connection_info);
+        let http_client = HyperClient::default();
+        let appender = Appender::new(&self.connection_info, http_client);
         appender.append(stream_name, expected_version, events)
     }
 
@@ -43,7 +46,8 @@ impl Client {
                                       count: u32,
                                       resolve_link_tos: bool)
                                       -> Result<Stream> {
-        let reader = Reader::new(&self.connection_info);
+        let http_client = HyperClient::default();
+        let reader = Reader::new(&self.connection_info, http_client);
         reader.read_stream_events_forward(stream_name, start, count, resolve_link_tos)
     }
 
@@ -51,7 +55,8 @@ impl Client {
                          stream_name: &str,
                          expected_version: ExpectedVersion)
                          -> Result<()> {
-        let deleter = Deleter::new(&self.connection_info);
+        let http_client = HyperClient::default();
+        let deleter = Deleter::new(&self.connection_info, http_client);
         deleter.delete(stream_name, expected_version)
     }
 
@@ -59,7 +64,8 @@ impl Client {
                               stream_name: &str,
                               expected_version: ExpectedVersion)
                               -> Result<()> {
-        let deleter = Deleter::new(&self.connection_info);
+        let http_client = HyperClient::default();
+        let deleter = Deleter::new(&self.connection_info, http_client);
         deleter.hard_delete(stream_name, expected_version)
     }
 }

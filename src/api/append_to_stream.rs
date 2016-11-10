@@ -1,4 +1,4 @@
-use hyper::Client;
+use hyper::Client as HyperClient;
 use hyper::client::Response as HyperResponse;
 use hyper::header::{Headers, ContentType};
 use hyper::mime::{Mime, TopLevel, SubLevel};
@@ -15,20 +15,19 @@ use api::to_error::*;
 
 pub struct Appender<'a> {
     connection_info: &'a ConnectionInfo,
+    http_client: HyperClient,
 }
 
 impl<'a> Appender<'a> {
-    pub fn new(connection_info: &'a ConnectionInfo) -> Appender {
-        Appender { connection_info: connection_info }
+    pub fn new(connection_info: &'a ConnectionInfo, http_client: HyperClient) -> Appender {
+        Appender { connection_info: connection_info, http_client: http_client }
     }
 
     pub fn append<I>(&self, stream_name: &str,
                      expected_version: ExpectedVersion,
                      events: I) -> Result<()>
         where I: IntoIterator<Item = Event> {
-        let http_client = Client::default();
-
-        let response = try!(http_client.post(&self.url(stream_name))
+        let response = try!(self.http_client.post(&self.url(stream_name))
             .headers(build_headers(expected_version))
             .body(&request_body(events))
             .send());

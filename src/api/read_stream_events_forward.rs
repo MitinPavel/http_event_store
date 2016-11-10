@@ -1,4 +1,4 @@
-use hyper::Client;
+use hyper::Client as HyperClient;
 use hyper::client::Response as HyperResponse;
 use hyper::header::{Headers, Accept, qitem};
 use hyper::mime::{Mime, TopLevel, SubLevel};
@@ -15,11 +15,12 @@ use api::ESResolveLinkTos;
 
 pub struct Reader<'a> {
     connection_info: &'a ConnectionInfo,
+    http_client: HyperClient,
 }
 
 impl<'a> Reader<'a> {
-    pub fn new(connection_info: &'a ConnectionInfo) -> Reader {
-        Reader { connection_info: connection_info }
+    pub fn new(connection_info: &'a ConnectionInfo, http_client: HyperClient) -> Reader {
+        Reader { connection_info: connection_info, http_client: http_client }
     }
 
     pub fn read_stream_events_forward(&self,
@@ -28,9 +29,7 @@ impl<'a> Reader<'a> {
                                       count: u32,
                                       resolve_link_tos: bool)
                                       -> Result<Stream> {
-        let http_client = Client::default();
-
-        let response = try!(http_client.get(&self.url(stream_name, start, count))
+        let response = try!(self.http_client.get(&self.url(stream_name, start, count))
             .headers(build_headers(resolve_link_tos))
             .send());
 
