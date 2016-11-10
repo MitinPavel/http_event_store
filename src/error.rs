@@ -17,18 +17,18 @@ pub enum UserErrorKind {
     StreamDeleted,
     BadRequest(hyper::client::Response),
     UnexpectedResponse(hyper::client::Response),
-    Http(hyper::error::Error),
 }
 
 #[derive(Debug)]
 pub enum LogicErrorKind {
     Json(serde_json::Error),
     Io(io::Error),
+    Http(hyper::error::Error),
 }
 
 impl From<hyper::error::Error> for HesError {
     fn from(err: hyper::error::Error) -> HesError {
-        HesError::UserError(UserErrorKind::Http(err))
+        HesError::LogicError(LogicErrorKind::Http(err))
     }
 }
 
