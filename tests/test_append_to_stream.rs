@@ -52,14 +52,14 @@ fn should_require_expected_version_to_be_correct() {
 }
 
 #[test]
-fn should_return_event_number_mismatch_error_if_expected_version_is_wrong() {
+fn should_return_wrong_expected_event_number_error_if_expected_version_is_wrong() {
     let client = Client::default();
     let stream_name = test_stream_name();
 
     let version = ExpectedVersion::Number(1);
     let result = client.append_to_stream(&stream_name, version, vec![task_created_event().into()]);
 
-    assert_error!(UserError, EventNumberMismatch(..), result.unwrap_err());
+    assert_error!(UserError, WrongExpectedEventNumber(..), result.unwrap_err());
 }
 
 #[test]

@@ -38,7 +38,7 @@ fn should_fail_if_expected_version_is_not_correct() {
 
     client.append_to_stream(&stream_name, ExpectedVersion::NoStream, events).unwrap();
     let result = client.hard_delete_stream(&stream_name, ExpectedVersion::NoStream);
-    assert_error!(UserError, EventNumberMismatch(..), result.unwrap_err());
+    assert_error!(UserError, WrongExpectedEventNumber(..), result.unwrap_err());
 }
 
 //TODO Turn into a function on support::task_domain.

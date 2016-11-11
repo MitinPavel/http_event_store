@@ -28,13 +28,13 @@ pub fn stream_deleted_error(response: HyperResponse) -> StdResult<HyperResponse,
     }
 }
 
-pub fn event_number_mismatch_error(response: HyperResponse)
+pub fn wrong_expected_event_number_error(response: HyperResponse)
                                    -> StdResult<HyperResponse, UserErrorKind> {
     match response.status {
         StatusCode::BadRequest => {
             if { response.status_raw().1 == WRONG_EXPECTED_EVENT_NUMBER } {
                 let version = expected_version(&response);
-                Err(UserErrorKind::EventNumberMismatch(version))
+                Err(UserErrorKind::WrongExpectedEventNumber(version))
             } else {
                 Err(UserErrorKind::BadRequest(response))
             }
