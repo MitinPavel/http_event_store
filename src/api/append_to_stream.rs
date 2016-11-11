@@ -32,7 +32,7 @@ impl<'a> Appender<'a> {
             .body(&request_body(events))
             .send());
 
-        to_hes_result(response)
+        to_result(response)
     }
 
     fn url(&self, stream_name: &str) -> String {
@@ -76,7 +76,7 @@ fn request_body<I>(events: I) -> String where I: IntoIterator<Item = Event> {
     format!("[{}]", events_as_json.join(","))
 }
 
-fn to_hes_result(response: HyperResponse) -> Result<()> {
+fn to_result(response: HyperResponse) -> Result<()> {
     match response.status {
         StatusCode::Created => Ok(()),
         _ => stream_deleted_error(response)

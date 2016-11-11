@@ -33,7 +33,7 @@ impl<'a> Reader<'a> {
             .headers(build_headers(resolve_link_tos))
             .send());
 
-        to_hes_result(response)
+        to_result(response)
     }
 
     fn url(&self, stream_name: &str, start: u32, count: u32) -> String {
@@ -57,7 +57,7 @@ fn build_headers(resolve_link_tos: bool) -> Headers {
     headers
 }
 
-fn to_hes_result(mut response: HyperResponse) -> Result<Stream> {
+fn to_result(mut response: HyperResponse) -> Result<Stream> {
     match response.status {
         StatusCode::Ok => {
             let mut body = String::new();

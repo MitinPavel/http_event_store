@@ -38,7 +38,7 @@ impl<'a> Deleter<'a> {
             .headers(build_headers(expected_version, is_hard))
             .send());
 
-        to_hes_result(response)
+        to_result(response)
     }
 
     fn url(&self, stream_name: &str) -> String {
@@ -57,7 +57,7 @@ fn build_headers(expected_version: ExpectedVersion, is_hard: bool) -> Headers {
     headers
 }
 
-fn to_hes_result(response: HyperResponse) -> Result<()> {
+fn to_result(response: HyperResponse) -> Result<()> {
     match response.status {
         StatusCode::NoContent => Ok(()),
         _ => stream_deleted_error(response)
