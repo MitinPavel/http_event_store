@@ -11,11 +11,12 @@ use connection::ConnectionInfo;
 
 pub struct Client {
     connection_info: ConnectionInfo,
+    http_client: HyperClient,
 }
 
 impl Client {
     pub fn new(connection_info: ConnectionInfo) -> Client {
-        Client { connection_info: connection_info }
+        Client { connection_info: connection_info, http_client: HyperClient::default() }
     }
 
     pub fn default() -> Client {
@@ -23,7 +24,8 @@ impl Client {
             connection_info: ConnectionInfo {
                 host: "127.0.0.1".into(),
                 port: 2113
-            }
+            },
+            http_client: HyperClient::default()
         }
     }
 
@@ -33,9 +35,7 @@ impl Client {
                                events: I)
                                -> Result<()>
         where I: IntoIterator<Item = Event> {
-
-        let http_client = HyperClient::default();
-        let appender = Appender::new(&self.connection_info, &http_client);
+        let appender = Appender::new(&self.connection_info, &self.http_client);
         appender.append(stream_name, expected_version, events)
     }
 
@@ -46,8 +46,7 @@ impl Client {
                                       count: u32,
                                       resolve_link_tos: bool)
                                       -> Result<Stream> {
-        let http_client = HyperClient::default();
-        let reader = Reader::new(&self.connection_info, &http_client);
+        let reader = Reader::new(&self.connection_info, &self.http_client);
         reader.read_stream_events_forward(stream_name, start, count, resolve_link_tos)
     }
 
@@ -55,8 +54,7 @@ impl Client {
                          stream_name: &str,
                          expected_version: ExpectedVersion)
                          -> Result<()> {
-        let http_client = HyperClient::default();
-        let deleter = Deleter::new(&self.connection_info, &http_client);
+        let deleter = Deleter::new(&self.connection_info, &self.http_client);
         deleter.delete(stream_name, expected_version)
     }
 
@@ -64,8 +62,7 @@ impl Client {
                               stream_name: &str,
                               expected_version: ExpectedVersion)
                               -> Result<()> {
-        let http_client = HyperClient::default();
-        let deleter = Deleter::new(&self.connection_info, &http_client);
+        let deleter = Deleter::new(&self.connection_info, &self.http_client);
         deleter.hard_delete(stream_name, expected_version)
     }
 }
