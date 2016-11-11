@@ -57,22 +57,19 @@ fn build_headers(resolve_link_tos: bool) -> Headers {
     headers
 }
 
-fn to_result(mut response: HyperResponse) -> Result<Stream> {
+fn to_result(response: HyperResponse) -> Result<Stream> {
     match response.status {
-        StatusCode::Ok => {
-            let mut body = String::new();
-            try!(response.read_to_string(&mut body));
-            let stream: Stream = try!(serde_json::from_str(&body));
-            Ok(stream)
-        },
-        StatusCode::NotFound => {
-            Err(HesError::UserError(UserErrorKind::StreamNotFound))
-        },
-        StatusCode::Gone => {
-            Err(HesError::UserError(UserErrorKind::StreamDeleted))
-        },
-        _ => {
-            Err(HesError::UserError(UserErrorKind::UnexpectedResponse(response)))
-        }
+        StatusCode::Ok => read_stream(response),
+        StatusCode::NotFound => Err(HesError::UserError(UserErrorKind::StreamNotFound)),
+        StatusCode::Gone => Err(HesError::UserError(UserErrorKind::StreamDeleted)),
+        _ => Err(HesError::UserError(UserErrorKind::UnexpectedResponse(response)))
     }
+}
+
+fn read_stream(mut response: HyperResponse) -> Result<Stream> {
+    let mut body = String::new();
+    try!(response.read_to_string(&mut body));
+    let stream: Stream = try!(serde_json::from_str(&body));
+
+    Ok(stream)
 }
