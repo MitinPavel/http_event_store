@@ -13,11 +13,11 @@ use api::to_error::*;
 
 pub struct Deleter<'a> {
     connection_info: &'a ConnectionInfo,
-    http_client: HyperClient,
+    http_client: &'a HyperClient,
 }
 
 impl<'a> Deleter<'a> {
-    pub fn new(connection_info: &'a ConnectionInfo, http_client: HyperClient) -> Deleter {
+    pub fn new(connection_info: &'a ConnectionInfo, http_client: &'a HyperClient) -> Deleter<'a> {
         Deleter { connection_info: connection_info, http_client: http_client }
     }
 

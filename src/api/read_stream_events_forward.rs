@@ -15,11 +15,11 @@ use api::ESResolveLinkTos;
 
 pub struct Reader<'a> {
     connection_info: &'a ConnectionInfo,
-    http_client: HyperClient,
+    http_client: &'a HyperClient,
 }
 
 impl<'a> Reader<'a> {
-    pub fn new(connection_info: &'a ConnectionInfo, http_client: HyperClient) -> Reader {
+    pub fn new(connection_info: &'a ConnectionInfo, http_client: &'a HyperClient) -> Reader<'a> {
         Reader { connection_info: connection_info, http_client: http_client }
     }
 

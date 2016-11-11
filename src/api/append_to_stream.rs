@@ -15,11 +15,11 @@ use api::to_error::*;
 
 pub struct Appender<'a> {
     connection_info: &'a ConnectionInfo,
-    http_client: HyperClient,
+    http_client: &'a HyperClient,
 }
 
 impl<'a> Appender<'a> {
-    pub fn new(connection_info: &'a ConnectionInfo, http_client: HyperClient) -> Appender {
+    pub fn new(connection_info: &'a ConnectionInfo, http_client: &'a HyperClient) -> Appender<'a> {
         Appender { connection_info: connection_info, http_client: http_client }
     }
 
