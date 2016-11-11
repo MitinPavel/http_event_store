@@ -15,7 +15,7 @@ pub fn default_error(response: HyperResponse) -> Result<()> {
     Err(HesError::UserError(UserErrorKind::UnexpectedResponse(response)))
 }
 
-pub fn stream_deleted_error(response: HyperResponse) -> StdResult<HyperResponse, UserErrorKind> {
+pub fn check_stream_deleted(response: HyperResponse) -> StdResult<HyperResponse, UserErrorKind> {
     match response.status {
         StatusCode::Gone => {
             if { response.status_raw().1 == STREAM_DELETED } {
@@ -28,7 +28,7 @@ pub fn stream_deleted_error(response: HyperResponse) -> StdResult<HyperResponse,
     }
 }
 
-pub fn wrong_expected_event_number_error(response: HyperResponse)
+pub fn check_wrong_expected_event_number(response: HyperResponse)
                                    -> StdResult<HyperResponse, UserErrorKind> {
     match response.status {
         StatusCode::BadRequest => {

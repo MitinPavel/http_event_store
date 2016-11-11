@@ -79,8 +79,8 @@ fn request_body<I>(events: I) -> String where I: IntoIterator<Item = Event> {
 fn to_result(response: HyperResponse) -> Result<()> {
     match response.status {
         StatusCode::Created => Ok(()),
-        _ => stream_deleted_error(response)
-            .and_then(wrong_expected_event_number_error)
+        _ => check_stream_deleted(response)
+            .and_then(check_wrong_expected_event_number)
             .map_err(|kind| HesError::UserError(kind))
             .and_then(default_error)
     }
