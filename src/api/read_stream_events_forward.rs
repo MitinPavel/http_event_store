@@ -8,7 +8,6 @@ use serde_json;
 
 use Stream;
 use error::ApiError;
-use error::UserErrorKind;
 use connection::ConnectionInfo;
 use api::ESResolveLinkTos;
 
@@ -59,9 +58,9 @@ fn build_headers(resolve_link_tos: bool) -> Headers {
 fn to_result(response: HyperResponse) -> Result<Stream, ApiError> {
     match response.status {
         StatusCode::Ok => read_stream(response),
-        StatusCode::NotFound => Err(ApiError::UserError(UserErrorKind::StreamNotFound)),
-        StatusCode::Gone => Err(ApiError::UserError(UserErrorKind::StreamDeleted)),
-        _ => Err(ApiError::UserError(UserErrorKind::UnexpectedResponse(response)))
+        StatusCode::NotFound => Err(ApiError::StreamNotFound),
+        StatusCode::Gone => Err(ApiError::StreamDeleted),
+        _ => Err(ApiError::UnexpectedResponse(response))
     }
 }
 

@@ -13,7 +13,6 @@ use hes::event::Event;
 use hes::client::Client;
 use hes::expected_version::ExpectedVersion;
 use hes::error::ApiError::*;
-use hes::error::UserErrorKind::*;
 
 #[test]
 fn should_append_events_in_right_order() {
@@ -59,7 +58,7 @@ fn should_return_wrong_expected_event_number_error_if_expected_version_is_wrong(
     let version = ExpectedVersion::Number(1);
     let result = client.append_to_stream(&stream_name, version, vec![task_created_event().into()]);
 
-    assert_error!(UserError, WrongExpectedEventNumber(..), result.unwrap_err());
+    assert_error!(WrongExpectedEventNumber(..), result.unwrap_err());
 }
 
 #[test]
@@ -74,7 +73,7 @@ fn should_return_bad_request_error_if_event_data_is_malformed() {
     };
     let result = client.append_to_stream(&stream_name, ExpectedVersion::NoStream, vec![malformed_event]);
 
-    assert_error!(UserError, BadRequest(..), result.unwrap_err());
+    assert_error!(BadRequest(..), result.unwrap_err());
 }
 
 #[test]
@@ -87,7 +86,7 @@ fn should_fail_appending_with_any_expected_version_to_deleted_stream() {
 
     let result = client.append_to_stream(&stream_name, ExpectedVersion::Any, vec![task_renamed_event().into()]);
 
-    assert_error!(UserError, StreamDeleted, result.unwrap_err());
+    assert_error!(StreamDeleted, result.unwrap_err());
 }
 
 fn test_stream_name() -> String {

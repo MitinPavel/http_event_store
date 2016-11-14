@@ -4,7 +4,6 @@ extern crate uuid;
 
 use hes::event::Event;
 use hes::error::ApiError::*;
-use hes::error::UserErrorKind::*;
 use hes::expected_version::ExpectedVersion;
 
 #[macro_use]
@@ -16,7 +15,7 @@ fn should_return_stream_not_found_error_attempting_to_read_nonexistent_stream() 
     let nonexistent_stream_name = "some-nonexistent";
     let result = client.read_stream_events_forward(&nonexistent_stream_name, 0, 1, true);
 
-    assert_error!(UserError, StreamNotFound, result.unwrap_err());
+    assert_error!(StreamNotFound, result.unwrap_err());
 }
 
 #[test]
@@ -33,5 +32,5 @@ fn should_return_stream_deleted_error_attempting_to_read_deleted_stream() {
     assert!(client.hard_delete_stream(&stream_name, ExpectedVersion::Any).is_ok());
 
     let result = client.read_stream_events_forward(&stream_name, 0, 1, true);
-    assert_error!(UserError, StreamDeleted, result.unwrap_err());
+    assert_error!(StreamDeleted, result.unwrap_err());
 }

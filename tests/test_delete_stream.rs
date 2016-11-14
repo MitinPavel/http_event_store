@@ -13,7 +13,6 @@ use hes::event::Event;
 use hes::client::Client;
 use hes::expected_version::ExpectedVersion;
 use hes::error::ApiError::*;
-use hes::error::UserErrorKind::*;
 
 #[test]
 fn should_delete_stream() {
@@ -26,7 +25,7 @@ fn should_delete_stream() {
     assert!(client.read_stream_events_forward(&stream_name, 0, 1, true).is_ok());
     assert!(client.delete_stream(&stream_name, ExpectedVersion::Any).is_ok());
     let result = client.read_stream_events_forward(&stream_name, 0, 1, true);
-    assert_error!(UserError, StreamNotFound, result.unwrap_err());
+    assert_error!(StreamNotFound, result.unwrap_err());
 }
 
 #[test]
@@ -38,7 +37,7 @@ fn should_fail_if_expected_version_is_not_correct() {
 
     client.append_to_stream(&stream_name, ExpectedVersion::NoStream, events).unwrap();
     let result = client.delete_stream(&stream_name, ExpectedVersion::NoStream);
-    assert_error!(UserError, WrongExpectedEventNumber(..), result.unwrap_err());
+    assert_error!(WrongExpectedEventNumber(..), result.unwrap_err());
 }
 
 //TODO Turn into a function on support::task_domain.
