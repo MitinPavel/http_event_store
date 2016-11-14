@@ -19,11 +19,8 @@ pub mod expected_version;
 pub mod event;
 pub mod client;
 pub mod error;
-pub mod types;
 mod connection;
 mod macros;
 mod api;
 
-pub use self::error::{HesError};
-
-pub use types::{Result};
+pub use self::error::HesError;

@@ -5,7 +5,6 @@ use hyper::mime::{Mime, TopLevel, SubLevel};
 use hyper::status::StatusCode;
 
 use event::Event;
-use types::Result;
 use expected_version::ExpectedVersion;
 use error::HesError;
 use connection::ConnectionInfo;
@@ -25,7 +24,7 @@ impl<'a> Appender<'a> {
 
     pub fn append<I>(&self, stream_name: &str,
                      expected_version: ExpectedVersion,
-                     events: I) -> Result<()>
+                     events: I) -> Result<(), HesError>
         where I: IntoIterator<Item = Event> {
         let response = try!(self.http_client.post(&self.url(stream_name))
             .headers(build_headers(expected_version))
@@ -76,7 +75,7 @@ fn request_body<I>(events: I) -> String where I: IntoIterator<Item = Event> {
     format!("[{}]", events_as_json.join(","))
 }
 
-fn to_result(response: HyperResponse) -> Result<()> {
+fn to_result(response: HyperResponse) -> Result<(), HesError> {
     match response.status {
         StatusCode::Created => Ok(()),
         _ => check_stream_deleted(response)

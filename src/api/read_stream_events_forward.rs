@@ -7,7 +7,6 @@ use std::io::Read;
 use serde_json;
 
 use Stream;
-use types::Result;
 use error::HesError;
 use error::UserErrorKind;
 use connection::ConnectionInfo;
@@ -28,7 +27,7 @@ impl<'a> Reader<'a> {
                                       start: u32,
                                       count: u32,
                                       resolve_link_tos: bool)
-                                      -> Result<Stream> {
+                                      -> Result<Stream, HesError> {
         let response = try!(self.http_client.get(&self.url(stream_name, start, count))
             .headers(build_headers(resolve_link_tos))
             .send());
@@ -57,7 +56,7 @@ fn build_headers(resolve_link_tos: bool) -> Headers {
     headers
 }
 
-fn to_result(response: HyperResponse) -> Result<Stream> {
+fn to_result(response: HyperResponse) -> Result<Stream, HesError> {
     match response.status {
         StatusCode::Ok => read_stream(response),
         StatusCode::NotFound => Err(HesError::UserError(UserErrorKind::StreamNotFound)),
@@ -66,7 +65,7 @@ fn to_result(response: HyperResponse) -> Result<Stream> {
     }
 }
 
-fn read_stream(mut response: HyperResponse) -> Result<Stream> {
+fn read_stream(mut response: HyperResponse) -> Result<Stream, HesError> {
     let mut body = String::new();
     try!(response.read_to_string(&mut body));
     let stream: Stream = try!(serde_json::from_str(&body));

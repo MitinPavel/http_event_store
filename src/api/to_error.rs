@@ -1,8 +1,6 @@
-use std::result::Result as StdResult;
 use hyper::client::Response as HyperResponse;
 use hyper::status::StatusCode;
 
-use types::Result;
 use expected_version::ExpectedVersion;
 use error::HesError;
 use error::UserErrorKind;
@@ -11,11 +9,11 @@ use api::ESCurrentVersion;
 const WRONG_EXPECTED_EVENT_NUMBER: &'static str = "Wrong expected EventNumber";
 const STREAM_DELETED: &'static str = "Stream deleted";
 
-pub fn default_error(response: HyperResponse) -> Result<()> {
+pub fn default_error(response: HyperResponse) -> Result<(), HesError> {
     Err(HesError::UserError(UserErrorKind::UnexpectedResponse(response)))
 }
 
-pub fn check_stream_deleted(response: HyperResponse) -> StdResult<HyperResponse, UserErrorKind> {
+pub fn check_stream_deleted(response: HyperResponse) -> Result<HyperResponse, UserErrorKind> {
     match response.status {
         StatusCode::Gone => {
             if { response.status_raw().1 == STREAM_DELETED } {
@@ -29,7 +27,7 @@ pub fn check_stream_deleted(response: HyperResponse) -> StdResult<HyperResponse,
 }
 
 pub fn check_wrong_expected_event_number(response: HyperResponse)
-                                   -> StdResult<HyperResponse, UserErrorKind> {
+                                   -> Result<HyperResponse, UserErrorKind> {
     match response.status {
         StatusCode::BadRequest => {
             if { response.status_raw().1 == WRONG_EXPECTED_EVENT_NUMBER } {
