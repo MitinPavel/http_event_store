@@ -81,7 +81,7 @@ fn to_result(response: HyperResponse) -> Result<()> {
         StatusCode::Created => Ok(()),
         _ => check_stream_deleted(response)
             .and_then(check_wrong_expected_event_number)
-            .map_err(|kind| HesError::UserError(kind))
+            .map_err(HesError::UserError)
             .and_then(default_error)
     }
 }
