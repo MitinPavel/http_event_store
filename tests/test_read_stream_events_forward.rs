@@ -3,7 +3,7 @@ extern crate http_event_store as hes;
 extern crate uuid;
 
 use hes::event::Event;
-use hes::error::HesError::*;
+use hes::error::ApiError::*;
 use hes::error::UserErrorKind::*;
 use hes::expected_version::ExpectedVersion;
 

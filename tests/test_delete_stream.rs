@@ -12,7 +12,7 @@ use support::task_domain::*;
 use hes::event::Event;
 use hes::client::Client;
 use hes::expected_version::ExpectedVersion;
-use hes::error::HesError::*;
+use hes::error::ApiError::*;
 use hes::error::UserErrorKind::*;
 
 #[test]

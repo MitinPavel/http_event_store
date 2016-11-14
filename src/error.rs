@@ -4,7 +4,7 @@ use std::io;
 use expected_version::ExpectedVersion;
 
 #[derive(Debug)]
-pub enum HesError { // `Hes` stands for HttpEventStore
+pub enum ApiError {
     UserError(UserErrorKind),
     LogicError(LogicErrorKind),
     //TransientFailure,
@@ -26,20 +26,20 @@ pub enum LogicErrorKind {
     Http(hyper::error::Error),
 }
 
-impl From<hyper::error::Error> for HesError {
-    fn from(err: hyper::error::Error) -> HesError {
-        HesError::LogicError(LogicErrorKind::Http(err))
+impl From<hyper::error::Error> for ApiError {
+    fn from(err: hyper::error::Error) -> ApiError {
+        ApiError::LogicError(LogicErrorKind::Http(err))
     }
 }
 
-impl From<io::Error> for HesError {
-    fn from(err: io::Error) -> HesError {
-        HesError::LogicError(LogicErrorKind::Io(err))
+impl From<io::Error> for ApiError {
+    fn from(err: io::Error) -> ApiError {
+        ApiError::LogicError(LogicErrorKind::Io(err))
     }
 }
 
-impl From<serde_json::Error> for HesError {
- fn from(err: serde_json::Error) -> HesError {
-        HesError::LogicError(LogicErrorKind::Json(err))
+impl From<serde_json::Error> for ApiError {
+ fn from(err: serde_json::Error) -> ApiError {
+        ApiError::LogicError(LogicErrorKind::Json(err))
     }
 }

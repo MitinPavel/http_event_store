@@ -5,7 +5,7 @@ use api::read_stream_events_forward::Reader;
 use api::delete_stream::Deleter;
 use Stream;
 use event::Event;
-use error::HesError;
+use error::ApiError;
 use expected_version::ExpectedVersion;
 use connection::ConnectionInfo;
 
@@ -33,7 +33,7 @@ impl Client {
                                stream_name: &str,
                                expected_version: ExpectedVersion,
                                events: I)
-                               -> Result<(), HesError>
+                               -> Result<(), ApiError>
         where I: IntoIterator<Item = Event> {
         let appender = Appender::new(&self.connection_info, &self.http_client);
         appender.append(stream_name, expected_version, events)
@@ -45,7 +45,7 @@ impl Client {
                                       start: u32,
                                       count: u32,
                                       resolve_link_tos: bool)
-                                      -> Result<Stream, HesError> {
+                                      -> Result<Stream, ApiError> {
         let reader = Reader::new(&self.connection_info, &self.http_client);
         reader.read_stream_events_forward(stream_name, start, count, resolve_link_tos)
     }
@@ -53,7 +53,7 @@ impl Client {
     pub fn delete_stream(&self,
                          stream_name: &str,
                          expected_version: ExpectedVersion)
-                         -> Result<(), HesError> {
+                         -> Result<(), ApiError> {
         let deleter = Deleter::new(&self.connection_info, &self.http_client);
         deleter.delete(stream_name, expected_version)
     }
@@ -61,7 +61,7 @@ impl Client {
     pub fn hard_delete_stream(&self,
                               stream_name: &str,
                               expected_version: ExpectedVersion)
-                              -> Result<(), HesError> {
+                              -> Result<(), ApiError> {
         let deleter = Deleter::new(&self.connection_info, &self.http_client);
         deleter.hard_delete(stream_name, expected_version)
     }

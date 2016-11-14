@@ -3,7 +3,7 @@ use hyper::client::Response as HyperResponse;
 use hyper::status::StatusCode;
 use hyper::header::Headers;
 
-use error::HesError;
+use error::ApiError;
 use connection::ConnectionInfo;
 use expected_version::ExpectedVersion;
 use api::ESExpectedVersion;
@@ -20,11 +20,11 @@ impl<'a> Deleter<'a> {
         Deleter { connection_info: connection_info, http_client: http_client }
     }
 
-    pub fn delete(&self, stream_name: &str, expected_version: ExpectedVersion) -> Result<(), HesError> {
+    pub fn delete(&self, stream_name: &str, expected_version: ExpectedVersion) -> Result<(), ApiError> {
         self.do_delete(stream_name, expected_version, false)
     }
 
-    pub fn hard_delete(&self, stream_name: &str, expected_version: ExpectedVersion) -> Result<(), HesError> {
+    pub fn hard_delete(&self, stream_name: &str, expected_version: ExpectedVersion) -> Result<(), ApiError> {
         self.do_delete(stream_name, expected_version, true)
     }
 
@@ -32,7 +32,7 @@ impl<'a> Deleter<'a> {
                  stream_name: &str,
                  expected_version: ExpectedVersion,
                  is_hard: bool)
-                 -> Result<(), HesError> {
+                 -> Result<(), ApiError> {
         let response = try!(self.http_client.delete(&self.url(stream_name))
             .headers(build_headers(expected_version, is_hard))
             .send());
@@ -56,12 +56,12 @@ fn build_headers(expected_version: ExpectedVersion, is_hard: bool) -> Headers {
     headers
 }
 
-fn to_result(response: HyperResponse) -> Result<(), HesError> {
+fn to_result(response: HyperResponse) -> Result<(), ApiError> {
     match response.status {
         StatusCode::NoContent => Ok(()),
         _ => check_stream_deleted(response)
             .and_then(check_wrong_expected_event_number)
-            .map_err(HesError::UserError)
+            .map_err(ApiError::UserError)
             .and_then(default_error)
     }
 }

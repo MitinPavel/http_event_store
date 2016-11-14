@@ -6,7 +6,7 @@ use hyper::status::StatusCode;
 
 use event::Event;
 use expected_version::ExpectedVersion;
-use error::HesError;
+use error::ApiError;
 use connection::ConnectionInfo;
 
 use api::ESExpectedVersion;
@@ -24,7 +24,7 @@ impl<'a> Appender<'a> {
 
     pub fn append<I>(&self, stream_name: &str,
                      expected_version: ExpectedVersion,
-                     events: I) -> Result<(), HesError>
+                     events: I) -> Result<(), ApiError>
         where I: IntoIterator<Item = Event> {
         let response = try!(self.http_client.post(&self.url(stream_name))
             .headers(build_headers(expected_version))
@@ -75,12 +75,12 @@ fn request_body<I>(events: I) -> String where I: IntoIterator<Item = Event> {
     format!("[{}]", events_as_json.join(","))
 }
 
-fn to_result(response: HyperResponse) -> Result<(), HesError> {
+fn to_result(response: HyperResponse) -> Result<(), ApiError> {
     match response.status {
         StatusCode::Created => Ok(()),
         _ => check_stream_deleted(response)
             .and_then(check_wrong_expected_event_number)
-            .map_err(HesError::UserError)
+            .map_err(ApiError::UserError)
             .and_then(default_error)
     }
 }

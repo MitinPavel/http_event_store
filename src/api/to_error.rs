@@ -2,15 +2,15 @@ use hyper::client::Response as HyperResponse;
 use hyper::status::StatusCode;
 
 use expected_version::ExpectedVersion;
-use error::HesError;
+use error::ApiError;
 use error::UserErrorKind;
 use api::ESCurrentVersion;
 
 const WRONG_EXPECTED_EVENT_NUMBER: &'static str = "Wrong expected EventNumber";
 const STREAM_DELETED: &'static str = "Stream deleted";
 
-pub fn default_error(response: HyperResponse) -> Result<(), HesError> {
-    Err(HesError::UserError(UserErrorKind::UnexpectedResponse(response)))
+pub fn default_error(response: HyperResponse) -> Result<(), ApiError> {
+    Err(ApiError::UserError(UserErrorKind::UnexpectedResponse(response)))
 }
 
 pub fn check_stream_deleted(response: HyperResponse) -> Result<HyperResponse, UserErrorKind> {

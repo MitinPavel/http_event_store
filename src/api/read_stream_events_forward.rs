@@ -7,7 +7,7 @@ use std::io::Read;
 use serde_json;
 
 use Stream;
-use error::HesError;
+use error::ApiError;
 use error::UserErrorKind;
 use connection::ConnectionInfo;
 use api::ESResolveLinkTos;
@@ -27,7 +27,7 @@ impl<'a> Reader<'a> {
                                       start: u32,
                                       count: u32,
                                       resolve_link_tos: bool)
-                                      -> Result<Stream, HesError> {
+                                      -> Result<Stream, ApiError> {
         let response = try!(self.http_client.get(&self.url(stream_name, start, count))
             .headers(build_headers(resolve_link_tos))
             .send());
@@ -56,16 +56,16 @@ fn build_headers(resolve_link_tos: bool) -> Headers {
     headers
 }
 
-fn to_result(response: HyperResponse) -> Result<Stream, HesError> {
+fn to_result(response: HyperResponse) -> Result<Stream, ApiError> {
     match response.status {
         StatusCode::Ok => read_stream(response),
-        StatusCode::NotFound => Err(HesError::UserError(UserErrorKind::StreamNotFound)),
-        StatusCode::Gone => Err(HesError::UserError(UserErrorKind::StreamDeleted)),
-        _ => Err(HesError::UserError(UserErrorKind::UnexpectedResponse(response)))
+        StatusCode::NotFound => Err(ApiError::UserError(UserErrorKind::StreamNotFound)),
+        StatusCode::Gone => Err(ApiError::UserError(UserErrorKind::StreamDeleted)),
+        _ => Err(ApiError::UserError(UserErrorKind::UnexpectedResponse(response)))
     }
 }
 
-fn read_stream(mut response: HyperResponse) -> Result<Stream, HesError> {
+fn read_stream(mut response: HyperResponse) -> Result<Stream, ApiError> {
     let mut body = String::new();
     try!(response.read_to_string(&mut body));
     let stream: Stream = try!(serde_json::from_str(&body));

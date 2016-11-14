@@ -23,4 +23,4 @@ mod connection;
 mod macros;
 mod api;
 
-pub use self::error::HesError;
+pub use self::error::ApiError;
