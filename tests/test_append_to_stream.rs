@@ -10,8 +10,6 @@ mod support;
 
 use support::task_domain::*;
 
-use hyper::status::StatusCode;
-
 use hes::event::Event;
 use hes::client::Client;
 use hes::expected_version::ExpectedVersion;
@@ -76,10 +74,7 @@ fn should_return_bad_request_error_if_event_data_is_malformed() {
     };
     let result = client.append_to_stream(&stream_name, ExpectedVersion::NoStream, vec![malformed_event]);
 
-    match result.unwrap_err() {
-        Restful(response) => assert_eq!(StatusCode::BadRequest, response.status),
-        _ =>  assert!(false)
-    }
+    assert_error_status_code!(StatusCode::BadRequest, result);
 }
 
 #[test]
