@@ -9,7 +9,7 @@ const WRONG_EXPECTED_EVENT_NUMBER: &'static str = "Wrong expected EventNumber";
 const STREAM_DELETED: &'static str = "Stream deleted";
 
 pub fn default_error(response: HyperResponse) -> Result<(), ApiError> {
-    Err(ApiError::UnexpectedResponse(response))
+    Err(ApiError::Restful(response))
 }
 
 pub fn check_stream_deleted(response: HyperResponse) -> Result<HyperResponse, ApiError> {
@@ -18,7 +18,7 @@ pub fn check_stream_deleted(response: HyperResponse) -> Result<HyperResponse, Ap
             if { response.status_raw().1 == STREAM_DELETED } {
                 Err(ApiError::StreamDeleted)
             } else {
-                Err(ApiError::UnexpectedResponse(response))
+                Err(ApiError::Restful(response))
             }
         },
         _ => Ok(response)
@@ -33,7 +33,7 @@ pub fn check_wrong_expected_event_number(response: HyperResponse)
                 let version = expected_version(&response);
                 Err(ApiError::WrongExpectedEventNumber(version))
             } else {
-                Err(ApiError::BadRequest(response))
+                Err(ApiError::Restful(response))
             }
         },
         _ => Ok(response)

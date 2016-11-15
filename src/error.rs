@@ -8,12 +8,11 @@ pub enum ApiError {
     WrongExpectedEventNumber(Option<ExpectedVersion>),
     StreamNotFound,
     StreamDeleted,
-    BadRequest(hyper::client::Response),
-    UnexpectedResponse(hyper::client::Response),
 
+    Restful(hyper::client::Response),
+    Http(hyper::error::Error),
     Json(serde_json::Error),
     Io(io::Error),
-    Http(hyper::error::Error),
 }
 
 impl From<hyper::error::Error> for ApiError {

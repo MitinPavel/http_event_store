@@ -1,3 +1,4 @@
+extern crate hyper;
 extern crate serde;
 extern crate serde_json;
 extern crate time;
@@ -8,6 +9,8 @@ extern crate http_event_store as hes;
 mod support;
 
 use support::task_domain::*;
+
+use hyper::status::StatusCode;
 
 use hes::event::Event;
 use hes::client::Client;
@@ -73,7 +76,10 @@ fn should_return_bad_request_error_if_event_data_is_malformed() {
     };
     let result = client.append_to_stream(&stream_name, ExpectedVersion::NoStream, vec![malformed_event]);
 
-    assert_error!(BadRequest(..), result.unwrap_err());
+    match result.unwrap_err() {
+        Restful(response) => assert_eq!(StatusCode::BadRequest, response.status),
+        _ =>  assert!(false)
+    }
 }
 
 #[test]
