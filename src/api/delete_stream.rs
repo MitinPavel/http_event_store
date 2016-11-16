@@ -20,11 +20,13 @@ impl<'a> Deleter<'a> {
         Deleter { connection_info: connection_info, http_client: http_client }
     }
 
-    pub fn delete(&self, stream_name: &str, expected_version: ExpectedVersion) -> Result<(), ApiError> {
+    pub fn delete(&self, stream_name: &str, expected_version: ExpectedVersion)
+                  -> Result<(), ApiError> {
         self.do_delete(stream_name, expected_version, false)
     }
 
-    pub fn hard_delete(&self, stream_name: &str, expected_version: ExpectedVersion) -> Result<(), ApiError> {
+    pub fn hard_delete(&self, stream_name: &str, expected_version: ExpectedVersion)
+                       -> Result<(), ApiError> {
         self.do_delete(stream_name, expected_version, true)
     }
 

@@ -30,8 +30,7 @@ pub fn check_wrong_expected_event_number(response: HyperResponse)
     match response.status {
         StatusCode::BadRequest => {
             if { response.status_raw().1 == WRONG_EXPECTED_EVENT_NUMBER } {
-                let version = expected_version(&response);
-                Err(ApiError::WrongExpectedEventNumber(version))
+                Err(ApiError::WrongExpectedEventNumber(expected_version(&response)))
             } else {
                 Err(ApiError::Restful(response))
             }
