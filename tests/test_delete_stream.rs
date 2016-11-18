@@ -25,7 +25,7 @@ fn should_delete_stream() {
     assert!(client.read_stream_events_forward(&stream_name, 0, 1, true).is_ok());
     assert!(client.delete_stream(&stream_name, ExpectedVersion::Any).is_ok());
     let result = client.read_stream_events_forward(&stream_name, 0, 1, true);
-    assert_error!(StreamNotFound, result.unwrap_err());
+    assert_error!(StreamNotFound(..), result.unwrap_err());
 }
 
 #[test]

@@ -31,7 +31,7 @@ impl<'a> Reader<'a> {
             .headers(build_headers(resolve_link_tos))
             .send());
 
-        to_result(response)
+        to_result(response, stream_name)
     }
 
     fn url(&self, stream_name: &str, start: u32, count: u32) -> String {
@@ -55,10 +55,10 @@ fn build_headers(resolve_link_tos: bool) -> Headers {
     headers
 }
 
-fn to_result(response: HyperResponse) -> Result<Stream, ApiError> {
+fn to_result(response: HyperResponse, stream_name: &str) -> Result<Stream, ApiError> {
     match response.status {
         StatusCode::Ok => read_stream(response),
-        StatusCode::NotFound => Err(ApiError::StreamNotFound),
+        StatusCode::NotFound => Err(ApiError::StreamNotFound(stream_name.into())),
         StatusCode::Gone => Err(ApiError::StreamDeleted),
         _ => Err(ApiError::Restful(response))
     }
