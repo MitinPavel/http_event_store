@@ -22,7 +22,8 @@ impl<'a> Appender<'a> {
         Appender { connection_info: connection_info, http_client: http_client }
     }
 
-    pub fn append<I>(&self, stream_name: &str,
+    pub fn append<I>(&self,
+                     stream_name: &str,
                      expected_version: ExpectedVersion,
                      events: I) -> Result<(), ApiError>
         where I: IntoIterator<Item = Event> {
@@ -31,7 +32,7 @@ impl<'a> Appender<'a> {
             .body(&request_body(events))
             .send());
 
-        to_result(response)
+        to_result(response, stream_name)
     }
 
     fn url(&self, stream_name: &str) -> String {
@@ -75,10 +76,10 @@ fn request_body<I>(events: I) -> String where I: IntoIterator<Item = Event> {
     format!("[{}]", events_as_json.join(","))
 }
 
-fn to_result(response: HyperResponse) -> Result<(), ApiError> {
+fn to_result(response: HyperResponse, stream_name: &str) -> Result<(), ApiError> {
     match response.status {
         StatusCode::Created => Ok(()),
-        _ => check_stream_deleted(response)
+        _ => check_stream_deleted(response, stream_name)
             .and_then(check_wrong_expected_event_number)
             .and_then(default_error)
     }

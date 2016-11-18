@@ -39,7 +39,7 @@ impl<'a> Deleter<'a> {
             .headers(build_headers(expected_version, is_hard))
             .send());
 
-        to_result(response)
+        to_result(response, stream_name)
     }
 
     fn url(&self, stream_name: &str) -> String {
@@ -58,10 +58,10 @@ fn build_headers(expected_version: ExpectedVersion, is_hard: bool) -> Headers {
     headers
 }
 
-fn to_result(response: HyperResponse) -> Result<(), ApiError> {
+fn to_result(response: HyperResponse, stream_name: &str) -> Result<(), ApiError> {
     match response.status {
         StatusCode::NoContent => Ok(()),
-        _ => check_stream_deleted(response)
+        _ => check_stream_deleted(response, stream_name)
             .and_then(check_wrong_expected_event_number)
             .and_then(default_error)
     }

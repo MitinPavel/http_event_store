@@ -59,7 +59,7 @@ fn to_result(response: HyperResponse, stream_name: &str) -> Result<Stream, ApiEr
     match response.status {
         StatusCode::Ok => read_stream(response),
         StatusCode::NotFound => Err(ApiError::StreamNotFound(stream_name.into())),
-        StatusCode::Gone => Err(ApiError::StreamDeleted),
+        StatusCode::Gone => Err(ApiError::StreamDeleted(stream_name.into())),
         _ => Err(ApiError::Restful(response))
     }
 }

@@ -32,5 +32,5 @@ fn should_return_stream_deleted_error_attempting_to_read_deleted_stream() {
     assert!(client.hard_delete_stream(&stream_name, ExpectedVersion::Any).is_ok());
 
     let result = client.read_stream_events_forward(&stream_name, 0, 1, true);
-    assert_error!(StreamDeleted, result.unwrap_err());
+    assert_error!(StreamDeleted(..), result.unwrap_err());
 }

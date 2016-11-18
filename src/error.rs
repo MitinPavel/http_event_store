@@ -7,7 +7,7 @@ use expected_version::ExpectedVersion;
 pub enum ApiError {
     WrongExpectedEventNumber(Option<ExpectedVersion>),
     StreamNotFound(String),
-    StreamDeleted, //TODO: Turn to StreamDeleted(String), storing `stream_name` as a part of a error.
+    StreamDeleted(String),
 
     Restful(hyper::client::Response),
     Http(hyper::error::Error),

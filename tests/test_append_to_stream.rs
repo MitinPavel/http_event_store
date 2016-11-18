@@ -87,7 +87,7 @@ fn should_fail_appending_with_any_expected_version_to_deleted_stream() {
 
     let result = client.append_to_stream(&stream_name, ExpectedVersion::Any, vec![task_renamed_event().into()]);
 
-    assert_error!(StreamDeleted, result.unwrap_err());
+    assert_error!(StreamDeleted(..), result.unwrap_err());
 }
 
 fn test_stream_name() -> String {

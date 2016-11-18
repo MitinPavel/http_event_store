@@ -12,11 +12,11 @@ pub fn default_error(response: HyperResponse) -> Result<(), ApiError> {
     Err(ApiError::Restful(response))
 }
 
-pub fn check_stream_deleted(response: HyperResponse) -> Result<HyperResponse, ApiError> {
+pub fn check_stream_deleted(response: HyperResponse, stream_name: &str) -> Result<HyperResponse, ApiError> {
     match response.status {
         StatusCode::Gone => {
             if { response.status_raw().1 == STREAM_DELETED } {
-                Err(ApiError::StreamDeleted)
+                Err(ApiError::StreamDeleted(stream_name.into()))
             } else {
                 Err(ApiError::Restful(response))
             }
