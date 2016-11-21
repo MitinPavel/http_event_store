@@ -2,6 +2,7 @@ extern crate time;
 extern crate http_event_store as hes;
 extern crate uuid;
 
+use hes::client::Client;
 use hes::event::Event;
 use hes::error::ApiError::*;
 use hes::expected_version::ExpectedVersion;
@@ -11,7 +12,7 @@ mod support;
 
 #[test]
 fn should_return_stream_not_found_error_attempting_to_read_nonexistent_stream() {
-    let client = hes::client::Client::default();
+    let client = Client::default();
     let nonexistent_stream_name = "some-nonexistent";
     let result = client.read_stream_events_forward(&nonexistent_stream_name, 0, 1, true);
 
@@ -24,7 +25,7 @@ fn should_return_stream_deleted_error_attempting_to_read_deleted_stream() {
                                           event_type: "created".to_string(),
                                           data: Some("{a:1}".to_string()) }];
 
-    let client = hes::client::Client::default();
+    let client = Client::default();
     let stream_name = format!("stream-{}", uuid::Uuid::new_v4().simple());
     client.append_to_stream(&stream_name, ExpectedVersion::NoStream, events).unwrap();
 
