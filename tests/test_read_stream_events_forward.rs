@@ -21,7 +21,7 @@ fn should_return_stream_not_found_error_attempting_to_read_nonexistent_stream() 
 
 #[test]
 fn should_return_stream_deleted_error_attempting_to_read_deleted_stream() {
-    let events: Vec<Event> = vec![Event { event_id: Some(uuid::Uuid::new_v4()),
+    let events: Vec<Event> = vec![Event { event_id: uuid::Uuid::new_v4(),
                                           event_type: "created".to_string(),
                                           data: Some("{a:1}".to_string()) }];
 

@@ -17,7 +17,7 @@ pub struct TaskRenamed {
 impl From<TaskCreated> for es::event::Event {
     fn from(e: TaskCreated) -> Self {
         es::event::Event {
-            event_id: Some(e.event_id),
+            event_id: e.event_id,
             event_type: "task-created".to_string(),
             data: Some(format!(r#"{{ "name": "{}" }}"#, e.name))
         }
@@ -27,7 +27,7 @@ impl From<TaskCreated> for es::event::Event {
 impl From<TaskRenamed> for es::event::Event {
     fn from(e: TaskRenamed) -> Self {
         es::event::Event {
-            event_id: Some(e.event_id),
+            event_id: e.event_id,
             event_type: "task-renamed".to_string(),
             data: Some(format!(r#"{{ "name": "{}" }}"#, e.name))
         }

@@ -56,12 +56,9 @@ fn build_headers(expected_version: ExpectedVersion) -> Headers {
 
 fn request_body<I>(events: I) -> String where I: IntoIterator<Item = Event> {
     let events_as_json: Vec<String> = events.into_iter().map(|e| {
-        let mut result: String = format!(r#"{{"eventType":"{}""#, e.event_type);
-
-        if let Some(id) = e.event_id {
-            let id_pair = &format!(r#","eventId":"{}""#, id);
-            result.push_str(id_pair)
-        }
+        let mut result: String = format!(r#"{{"eventType":"{}","eventId":"{}""#,
+                                         e.event_type,
+                                         e.event_id);
 
         if let Some(ref data) = e.data {
             let data_pair = &format!(r#","data":{}"#, data);
