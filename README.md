@@ -28,6 +28,12 @@ Handle HTTP status codes:
 * NotImplemented
 * Unauthorized
 
+Event related C# files:
+* https://github.com/EventStore/EventStore/blob/08c2bdf7dcadd154cffa549d273e3a8e4673c5a1/src/EventStore.Core/Data/EventRecord.cs
+* https://github.com/EventStore/EventStore/blob/08c2bdf7dcadd154cffa549d273e3a8e4673c5a1/src/EventStore.Core/Data/ResolvedEvent.cs
+* https://github.com/EventStore/EventStore/blob/08c2bdf7dcadd154cffa549d273e3a8e4673c5a1/src/EventStore.ClientAPI/EventData.cs
+* https://github.com/EventStore/EventStore/blob/08c2bdf7dcadd154cffa549d273e3a8e4673c5a1/src/EventStore.ClientAPI/EventReadResult.cs
+
 TBD
 ===
 
