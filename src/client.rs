@@ -3,7 +3,7 @@ use hyper::Client as HyperClient;
 use api::append_to_stream::Appender;
 use api::read_stream_events_forward::Reader;
 use api::delete_stream::Deleter;
-use Stream;
+use read::Stream;
 use event::Event;
 use error::ApiError;
 use expected_version::ExpectedVersion;

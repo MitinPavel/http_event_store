@@ -1,31 +1,35 @@
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Stream {
-    pub author: serde_json::Value,
-    #[serde(rename = "eTag")]
-    pub e_tag: Option<serde_json::Value>,
-    pub entries: Vec<Entry>,
-    #[serde(rename = "headOfStream")]
-    pub head_of_stream: bool,
-    pub id: serde_json::Value,
-    pub links: serde_json::Value,
-    #[serde(rename = "selfUrl")]
-    pub self_url: Option<serde_json::Value>,
-    #[serde(rename = "streamId")]
-    pub stream_id: serde_json::Value,
-    pub title: serde_json::Value,
-    pub updated: serde_json::Value // "2016-09-06T18:14:50.042706Z"
-}
+mod read {
+    use serde_json;
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Entry {
-    #[serde(rename = "eventId")]
-    pub event_id: String,
-    #[serde(rename = "eventType")]
-    pub event_type: String,
-    pub data: serde_json::Value,
+    #[derive(Serialize, Deserialize, Debug)]
+    pub struct Stream {
+        pub author: serde_json::Value,
+        #[serde(rename = "eTag")]
+        pub e_tag: Option<serde_json::Value>,
+        pub entries: Vec<Entry>,
+        #[serde(rename = "headOfStream")]
+        pub head_of_stream: bool,
+        pub id: serde_json::Value,
+        pub links: serde_json::Value,
+        #[serde(rename = "selfUrl")]
+        pub self_url: Option<serde_json::Value>,
+        #[serde(rename = "streamId")]
+        pub stream_id: serde_json::Value,
+        pub title: serde_json::Value,
+        pub updated: serde_json::Value // "2016-09-06T18:14:50.042706Z"
+    }
 
-    #[serde(rename = "eventNumber")]
-    pub event_number: u64
+    #[derive(Serialize, Deserialize, Debug)]
+    pub struct Entry {
+        #[serde(rename = "eventId")]
+        pub event_id: String,
+        #[serde(rename = "eventType")]
+        pub event_type: String,
+        pub data: serde_json::Value,
+
+        #[serde(rename = "eventNumber")]
+        pub event_number: u64
+    }
 }
 
 //"author":{"name":"EventStore"},

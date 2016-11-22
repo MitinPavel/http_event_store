@@ -6,7 +6,7 @@ use hyper::status::StatusCode;
 use std::io::Read;
 use serde_json;
 
-use Stream;
+use read::Stream;
 use error::ApiError;
 use connection::ConnectionInfo;
 use api::ESResolveLinkTos;
