@@ -3,8 +3,9 @@ use hyper::client::Response as HyperResponse;
 use hyper::header::{Headers, ContentType};
 use hyper::mime::{Mime, TopLevel, SubLevel};
 use hyper::status::StatusCode;
+use serde_json;
 
-use event::Event;
+use write::Event;
 use expected_version::ExpectedVersion;
 use error::ApiError;
 use connection::ConnectionInfo;
@@ -55,22 +56,8 @@ fn build_headers(expected_version: ExpectedVersion) -> Headers {
 }
 
 fn request_body<I>(events: I) -> String where I: IntoIterator<Item = Event> {
-    let events_as_json: Vec<String> = events.into_iter().map(|e| {
-        let mut result: String = format!(r#"{{"eventType":"{}","eventId":"{}""#,
-                                         e.event_type,
-                                         e.event_id);
-
-        if let Some(ref data) = e.data {
-            let data_pair = &format!(r#","data":{}"#, data);
-            result.push_str(data_pair)
-        }
-
-        result.push_str(r#"}"#);
-
-        result
-    }).collect::<_>();
-
-    format!("[{}]", events_as_json.join(","))
+    let es: Vec<Event> = events.into_iter().collect::<_>();
+    serde_json::to_string(&es).unwrap()
 }
 
 fn to_result(response: HyperResponse, stream_name: &str) -> Result<(), ApiError> {

@@ -9,7 +9,7 @@ mod support;
 
 use support::task_domain::*;
 
-use hes::event::Event;
+use hes::write::Event;
 use hes::client::Client;
 use hes::expected_version::ExpectedVersion;
 use hes::error::ApiError::*;

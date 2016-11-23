@@ -3,7 +3,7 @@ extern crate http_event_store as hes;
 extern crate uuid;
 
 use hes::client::Client;
-use hes::event::Event;
+use hes::write::Event;
 use hes::error::ApiError::*;
 use hes::expected_version::ExpectedVersion;
 
@@ -23,7 +23,7 @@ fn should_return_stream_not_found_error_attempting_to_read_nonexistent_stream() 
 fn should_return_stream_deleted_error_attempting_to_read_deleted_stream() {
     let events: Vec<Event> = vec![Event { event_id: uuid::Uuid::new_v4(),
                                           event_type: "created".to_string(),
-                                          data: Some("{a:1}".to_string()) }];
+                                          data: None }];
 
     let client = Client::default();
     let stream_name = format!("stream-{}", uuid::Uuid::new_v4().simple());

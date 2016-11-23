@@ -10,7 +10,7 @@ mod support;
 
 use support::task_domain::*;
 
-use hes::event::Event;
+use hes::write::Event;
 use hes::client::Client;
 use hes::expected_version::ExpectedVersion;
 use hes::error::ApiError::*;
@@ -63,21 +63,6 @@ fn should_return_wrong_expected_event_number_error_if_expected_version_is_wrong(
 }
 
 #[test]
-fn should_return_bad_request_error_if_event_data_is_malformed() {
-    let client = Client::default();
-    let stream_name = test_stream_name();
-
-    let malformed_event = hes::event::Event {
-        event_id: uuid::Uuid::new_v4(),
-        event_type: "task-created".to_string(),
-        data: Some("?-/*".to_string())
-    };
-    let result = client.append_to_stream(&stream_name, ExpectedVersion::NoStream, vec![malformed_event]);
-
-    assert_error_status_code!(StatusCode::BadRequest, result);
-}
-
-#[test]
 fn should_fail_appending_with_any_expected_version_to_deleted_stream() {
     let client = Client::default();
     let stream_name = test_stream_name();
@@ -89,6 +74,10 @@ fn should_fail_appending_with_any_expected_version_to_deleted_stream() {
 
     assert_error!(StreamDeleted(..), result.unwrap_err());
 }
+
+
+#[test]
+fn should_cope_with_empty_event_collection() {}
 
 fn test_stream_name() -> String {
     format!("task-{}", uuid::Uuid::new_v4().simple())

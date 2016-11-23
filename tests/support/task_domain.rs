@@ -1,5 +1,6 @@
 extern crate uuid;
-extern crate http_event_store as es;
+extern crate serde_json;
+extern crate http_event_store as hes;
 
 //#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 #[derive(Clone)]
@@ -14,22 +15,22 @@ pub struct TaskRenamed {
     pub name: String
 }
 
-impl From<TaskCreated> for es::event::Event {
+impl From<TaskCreated> for hes::write::Event {
     fn from(e: TaskCreated) -> Self {
-        es::event::Event {
+        hes::write::Event {
             event_id: e.event_id,
             event_type: "task-created".to_string(),
-            data: Some(format!(r#"{{ "name": "{}" }}"#, e.name))
+            data: Some(serde_json::from_str(&format!(r#"{{ "name": "{}" }}"#, e.name)).unwrap())
         }
     }
 }
 
-impl From<TaskRenamed> for es::event::Event {
+impl From<TaskRenamed> for hes::write::Event {
     fn from(e: TaskRenamed) -> Self {
-        es::event::Event {
+        hes::write::Event {
             event_id: e.event_id,
             event_type: "task-renamed".to_string(),
-            data: Some(format!(r#"{{ "name": "{}" }}"#, e.name))
+            data: Some(serde_json::from_str(&format!(r#"{{ "name": "{}" }}"#, e.name)).unwrap())
         }
     }
 }

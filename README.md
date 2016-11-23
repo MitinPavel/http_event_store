@@ -48,7 +48,7 @@ pub trait Event {
     fn data(&self) -> Option<String>;
 }
 
-impl es::event::Event for TaskCreated {
+impl hes::write::Event for TaskCreated {
     fn event_id(&self) -> uuid::Uuid { self.event_id }
     fn event_type(&self) -> &str { "task-created" }
     fn data(&self) -> Option<String> { Some(format!(r#"{{ "name": "{}" }}"#, self.name)) }
@@ -63,9 +63,9 @@ pub struct Event {
     data: Option<String>
 }
 
-impl From<TaskCreated> for es::event::Event {
+impl From<TaskCreated> for hes::write::Event {
     fn from(t: TaskCreated) -> Self {
-        es::event::Event {
+        hes::write::Event {
             event_id: t.event_id,
             event_type: "task-created",
             data: Some(format!(r#"{{ "name": "{}" }}"#, t.name))
