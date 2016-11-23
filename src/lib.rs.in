@@ -16,6 +16,7 @@ pub mod write {
 pub mod read {
     use uuid;
     use serde_json;
+    use chrono;
 
     #[derive(Serialize, Deserialize, Debug)]
     pub struct Stream {
@@ -32,7 +33,7 @@ pub mod read {
         #[serde(rename = "streamId")]
         pub stream_id: String,
         pub title: String,
-        pub updated: serde_json::Value // "2016-09-06T18:14:50.042706Z"
+        pub updated: chrono::DateTime<chrono::UTC>
     }
 
     #[derive(Serialize, Deserialize, Debug)]

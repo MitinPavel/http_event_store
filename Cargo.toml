@@ -11,12 +11,10 @@ unstable = ["serde_macros"]
 [build-dependencies]
 serde_codegen = { version = "^0.8", optional = true }
 
-[dev-dependencies]
-chrono = "^0.2"
-
 [dependencies]
 hyper = "^0.9"
 serde = "^0.8"
 serde_json = "^0.8"
 serde_macros = { version = "^0.8", optional = true }
 uuid = { version = "^0.3", features = ["serde", "v4"] }
+chrono = { version = "^0.2", features = ["serde"] }

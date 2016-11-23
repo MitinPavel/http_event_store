@@ -5,6 +5,7 @@
 extern crate hyper;
 
 extern crate uuid;
+extern crate chrono;
 
 extern crate serde;
 extern crate serde_json;
