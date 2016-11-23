@@ -25,13 +25,13 @@ pub mod read {
         pub entries: Vec<Entry>,
         #[serde(rename = "headOfStream")]
         pub head_of_stream: bool,
-        pub id: serde_json::Value,
+        pub id: String,
         pub links: serde_json::Value,
         #[serde(rename = "selfUrl")]
-        pub self_url: Option<serde_json::Value>,
+        pub self_url: Option<String>,
         #[serde(rename = "streamId")]
-        pub stream_id: serde_json::Value,
-        pub title: serde_json::Value,
+        pub stream_id: String,
+        pub title: String,
         pub updated: serde_json::Value // "2016-09-06T18:14:50.042706Z"
     }
 
