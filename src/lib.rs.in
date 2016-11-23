@@ -14,6 +14,7 @@ pub mod write {
 }
 
 pub mod read {
+    use uuid;
     use serde_json;
 
     #[derive(Serialize, Deserialize, Debug)]
@@ -37,7 +38,7 @@ pub mod read {
     #[derive(Serialize, Deserialize, Debug)]
     pub struct Entry {
         #[serde(rename = "eventId")]
-        pub event_id: String,
+        pub event_id: uuid::Uuid,
         #[serde(rename = "eventType")]
         pub event_type: String,
         pub data: Option<serde_json::Value>,

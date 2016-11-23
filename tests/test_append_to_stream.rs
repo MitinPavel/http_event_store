@@ -17,9 +17,11 @@ use hes::error::ApiError::*;
 
 #[test]
 fn should_append_events_in_right_order() {
+    let created_id = uuid::Uuid::new_v4();
+    let updated_id = uuid::Uuid::new_v4();
     let events: Vec<Event> = vec![
-        TaskCreated { name: format!("Created {:?}", time::get_time()), event_id: uuid::Uuid::parse_str("baca1a30-b6f1-470b-b68e-f79338020327").unwrap() }.into(),
-        TaskRenamed { name: format!("Renamed {:?}", time::get_time()), event_id: uuid::Uuid::parse_str("cbad187b-2fd0-4ad2-b78b-80d83f1ff303").unwrap() }.into()
+        TaskCreated { name: format!("Created {:?}", time::get_time()), event_id: created_id }.into(),
+        TaskRenamed { name: format!("Renamed {:?}", time::get_time()), event_id: updated_id }.into()
     ];
 
     let client = Client::default();
@@ -29,8 +31,8 @@ fn should_append_events_in_right_order() {
 
     assert_eq!("task-renamed", stream.entries[0].event_type);
     assert_eq!("task-created", stream.entries[1].event_type);
-    assert_eq!("cbad187b-2fd0-4ad2-b78b-80d83f1ff303", stream.entries[0].event_id);
-    assert_eq!("baca1a30-b6f1-470b-b68e-f79338020327", stream.entries[1].event_id);
+    assert_eq!(updated_id, stream.entries[0].event_id);
+    assert_eq!(created_id, stream.entries[1].event_id);
 }
 
 #[test]
@@ -74,7 +76,6 @@ fn should_fail_appending_with_any_expected_version_to_deleted_stream() {
 
     assert_error!(StreamDeleted(..), result.unwrap_err());
 }
-
 
 #[test]
 fn should_cope_with_empty_event_collection() {}
