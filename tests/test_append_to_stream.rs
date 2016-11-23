@@ -33,6 +33,8 @@ fn should_append_events_in_right_order() {
     assert_eq!("task-created", stream.entries[1].event_type);
     assert_eq!(updated_id, stream.entries[0].event_id);
     assert_eq!(created_id, stream.entries[1].event_id);
+    assert_eq!(1, stream.entries[0].event_number);
+    assert_eq!(0, stream.entries[1].event_number);
 }
 
 #[test]
