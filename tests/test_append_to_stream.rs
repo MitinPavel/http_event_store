@@ -1,7 +1,7 @@
 extern crate hyper;
 extern crate serde;
 extern crate serde_json;
-extern crate time;
+extern crate chrono;
 extern crate uuid;
 extern crate http_event_store as hes;
 
@@ -20,8 +20,8 @@ fn should_append_events_in_right_order() {
     let created_id = uuid::Uuid::new_v4();
     let updated_id = uuid::Uuid::new_v4();
     let events: Vec<Event> = vec![
-        TaskCreated { name: format!("Created {:?}", time::get_time()), event_id: created_id }.into(),
-        TaskRenamed { name: format!("Renamed {:?}", time::get_time()), event_id: updated_id }.into()
+        TaskCreated { name: format!("Created {:?}", chrono::UTC::now()), event_id: created_id }.into(),
+        TaskRenamed { name: format!("Renamed {:?}", chrono::UTC::now()), event_id: updated_id }.into()
     ];
 
     let client = Client::default();
@@ -87,8 +87,8 @@ fn test_stream_name() -> String {
 }
 
 fn task_created_event() -> TaskCreated {
-    TaskCreated { name: format!("Created {:?}", time::get_time()), event_id: uuid::Uuid::new_v4() }
+    TaskCreated { name: format!("Created {:?}", chrono::UTC::now()), event_id: uuid::Uuid::new_v4() }
 }
 fn task_renamed_event() -> TaskRenamed {
-    TaskRenamed { name: format!("Renamed {:?}", time::get_time()), event_id: uuid::Uuid::new_v4() }
+    TaskRenamed { name: format!("Renamed {:?}", chrono::UTC::now()), event_id: uuid::Uuid::new_v4() }
 }

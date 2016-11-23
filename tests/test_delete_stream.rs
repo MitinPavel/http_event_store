@@ -1,6 +1,5 @@
 extern crate serde;
 extern crate serde_json;
-extern crate time;
 extern crate uuid;
 extern crate http_event_store as hes;
 

@@ -1,4 +1,4 @@
-extern crate time;
+extern crate chrono;
 extern crate http_event_store as hes;
 extern crate uuid;
 
