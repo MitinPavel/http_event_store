@@ -45,7 +45,7 @@ pub mod read {
         #[serde(rename = "eventId")]
         pub event_id: Uuid,
         #[serde(rename = "eventNumber")]
-        pub event_number: u64,
+        pub event_number: i32,
         #[serde(rename = "eventType")]
         pub event_type: String,
         pub id: Url,
