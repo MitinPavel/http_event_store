@@ -9,7 +9,7 @@ pub mod write {
         #[serde(rename = "eventType")]
         pub event_type: String,
         #[serde(skip_serializing_if = "Option::is_none")]
-        pub data: Option<serde_json::Value>
+        pub data: Option<serde_json::Value>,
     }
 }
 
@@ -35,56 +35,42 @@ pub mod read {
         #[serde(rename = "streamId")]
         pub stream_id: String,
         pub title: String,
-        pub updated: DateTime<UTC>
+        pub updated: DateTime<UTC>,
+    }
+
+    #[derive(Serialize, Deserialize, Debug)]
+    pub struct Entry {
+        pub author: BTreeMap<String, String>,
+        pub data: Option<serde_json::Value>,
+        #[serde(rename = "eventId")]
+        pub event_id: Uuid,
+        #[serde(rename = "eventNumber")]
+        pub event_number: u64,
+        #[serde(rename = "eventType")]
+        pub event_type: String,
+        pub id: Url,
+        #[serde(rename = "isJson")]
+        pub is_json: bool,
+        #[serde(rename = "isLinkMetaData")]
+        pub is_link_meta_data: bool,
+        #[serde(rename = "isMetaData")]
+        pub is_meta_data: bool,
+        pub links: Vec<Link>,
+        #[serde(rename = "positionEventNumber")]
+        pub position_event_number: i32,
+        #[serde(rename = "positionStreamId")]
+        pub position_stream_id: String,
+        #[serde(rename = "streamId")]
+        pub stream_id: String,
+        #[serde(rename = "summary")]
+        pub summary: String,
+        pub title: String,
+        pub updated: DateTime<UTC>,
     }
 
     #[derive(Serialize, Deserialize, Debug)]
     pub struct Link {
         pub relation: String,
-        pub uri: Url
-    }
-
-    #[derive(Serialize, Deserialize, Debug)]
-    pub struct Entry {
-        #[serde(rename = "eventId")]
-        pub event_id: Uuid,
-        #[serde(rename = "eventType")]
-        pub event_type: String,
-        pub data: Option<serde_json::Value>,
-
-        #[serde(rename = "eventNumber")]
-        pub event_number: u64
+        pub uri: Url,
     }
 }
-
-//"author":{"name":"EventStore"},
-//"eTag":"0;248368668",
-//"entries":[{"author":{"name":"EventStore"},
-//    "data":"{\n  \"a\": \"1\"\n}",
-//    "eventId":"fbf4a1a1-b4a3-4dfe-a01f-ec52c34e16e4",
-//    "eventNumber":0,
-//    "eventType": "event-type",
-//    "id":"http://127.0.0.1:2113/streams/newstream/0",
-//    "isJson":true,
-//    "isLinkMetaData":false,
-//    "isMetaData":false,
-//    "links":[
-//      {"relation":"edit","uri":"http://127.0.0.1:2113/streams/newstream/0"},
-//      {"relation":"alternate","uri":"http://127.0.0.1:2113/streams/newstream/0"}],
-//    "positionEventNumber":0,
-//    "positionStreamId":"newstream",
-//    "streamId":"newstream",
-//    "summary":"event-type",
-//    "title":"0@newstream",
-//    "updated":"2016-09-06T18:14:50.042706Z"}],
-//"headOfStream":true,
-//"id":"http://127.0.0.1:2113/streams/newstream",
-//"links":[
-//    {"relation":"self","uri":"http://127.0.0.1:2113/streams/newstream"},
-//    {"relation":"first","uri":"http://127.0.0.1:2113/streams/newstream/head/backward/20"},
-//    {"relation":"previous","uri":"http://127.0.0.1:2113/streams/newstream/1/forward/20"},
-//    {"relation":"metadata","uri":"http://127.0.0.1:2113/streams/newstream/metadata"}],
-//"selfUrl":"http://127.0.0.1:2113/streams/newstream",
-//"streamId":"newstream",
-//"title":"Event stream 'newstream'",
-// "updated":"2016-09-06T18:14:50.042706Z"
