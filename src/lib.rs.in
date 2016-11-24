@@ -29,13 +29,19 @@ pub mod read {
         #[serde(rename = "headOfStream")]
         pub head_of_stream: bool,
         pub id: Url,
-        pub links: Vec<BTreeMap<String, String>>,
+        pub links: Vec<Link>,
         #[serde(rename = "selfUrl")]
         pub self_url: Option<String>,
         #[serde(rename = "streamId")]
         pub stream_id: String,
         pub title: String,
         pub updated: DateTime<UTC>
+    }
+
+    #[derive(Serialize, Deserialize, Debug)]
+    pub struct Link {
+        pub relation: String,
+        pub uri: Url
     }
 
     #[derive(Serialize, Deserialize, Debug)]
