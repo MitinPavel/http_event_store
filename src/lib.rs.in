@@ -21,7 +21,7 @@ pub mod read {
 
     #[derive(Serialize, Deserialize, Debug)]
     pub struct Stream {
-        pub author: serde_json::Value,
+        pub author: BTreeMap<String, String>,
         #[serde(rename = "eTag")]
         pub e_tag: Option<String>,
         pub entries: Vec<Entry>,
