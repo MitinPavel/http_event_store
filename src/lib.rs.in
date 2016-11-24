@@ -16,6 +16,7 @@ pub mod write {
 pub mod read {
     use serde_json;
     use uuid::Uuid;
+    use url::Url;
     use chrono::{DateTime, UTC};
     use std::collections::BTreeMap;
 
@@ -27,7 +28,7 @@ pub mod read {
         pub entries: Vec<Entry>,
         #[serde(rename = "headOfStream")]
         pub head_of_stream: bool,
-        pub id: String,
+        pub id: Url,
         pub links: Vec<BTreeMap<String, String>>,
         #[serde(rename = "selfUrl")]
         pub self_url: Option<String>,
