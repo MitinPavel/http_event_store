@@ -1,11 +1,11 @@
 pub mod write {
-    use uuid;
     use serde_json;
+    use uuid::Uuid;
 
     #[derive(Serialize, Deserialize, Debug)]
     pub struct Event {
         #[serde(rename = "eventId")]
-        pub event_id: uuid::Uuid,
+        pub event_id: Uuid,
         #[serde(rename = "eventType")]
         pub event_type: String,
         #[serde(skip_serializing_if = "Option::is_none")]
@@ -14,9 +14,9 @@ pub mod write {
 }
 
 pub mod read {
-    use uuid;
     use serde_json;
-    use chrono;
+    use uuid::Uuid;
+    use chrono::{DateTime, UTC};
 
     #[derive(Serialize, Deserialize, Debug)]
     pub struct Stream {
@@ -33,13 +33,13 @@ pub mod read {
         #[serde(rename = "streamId")]
         pub stream_id: String,
         pub title: String,
-        pub updated: chrono::DateTime<chrono::UTC>
+        pub updated: DateTime<UTC>
     }
 
     #[derive(Serialize, Deserialize, Debug)]
     pub struct Entry {
         #[serde(rename = "eventId")]
-        pub event_id: uuid::Uuid,
+        pub event_id: Uuid,
         #[serde(rename = "eventType")]
         pub event_type: String,
         pub data: Option<serde_json::Value>,
