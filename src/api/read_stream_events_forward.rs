@@ -4,6 +4,7 @@ use hyper::header::{Headers, Accept, qitem};
 use hyper::mime::{Mime, TopLevel, SubLevel};
 use hyper::status::StatusCode;
 use std::io::Read;
+use serde;
 use serde_json;
 
 use read::Stream;
@@ -21,17 +22,17 @@ impl<'a> Reader<'a> {
         Reader { connection_info: connection_info, http_client: http_client }
     }
 
-    pub fn read_stream_events_forward(&self,
+    pub fn read_stream_events_forward<E: serde::Deserialize>(&self,
                                       stream_name: &str,
                                       start: u32,
                                       count: u32,
                                       resolve_link_tos: bool)
-                                      -> Result<Stream, ApiError> {
+                                      -> Result<Stream<E>, ApiError> {
         let response = try!(self.http_client.get(&self.url(stream_name, start, count))
             .headers(build_headers(resolve_link_tos))
             .send());
 
-        to_result(response, stream_name)
+        to_result::<E>(response, stream_name)
     }
 
     fn url(&self, stream_name: &str, start: u32, count: u32) -> String {
@@ -55,19 +56,19 @@ fn build_headers(resolve_link_tos: bool) -> Headers {
     headers
 }
 
-fn to_result(response: HyperResponse, stream_name: &str) -> Result<Stream, ApiError> {
+fn to_result<E: serde::Deserialize>(response: HyperResponse, stream_name: &str) -> Result<Stream<E>, ApiError> {
     match response.status {
-        StatusCode::Ok => read_stream(response),
+        StatusCode::Ok => read_stream::<E>(response),
         StatusCode::NotFound => Err(ApiError::StreamNotFound(stream_name.into())),
         StatusCode::Gone => Err(ApiError::StreamDeleted(stream_name.into())),
         _ => Err(ApiError::Restful(response))
     }
 }
 
-fn read_stream(mut response: HyperResponse) -> Result<Stream, ApiError> {
+fn read_stream<E: serde::Deserialize>(mut response: HyperResponse) -> Result<Stream<E>, ApiError> {
     let mut body = String::new();
     try!(response.read_to_string(&mut body));
-    let stream: Stream = try!(serde_json::from_str(&body));
+    let stream: Stream<E> = try!(serde_json::from_str(&body));
 
     Ok(stream)
 }

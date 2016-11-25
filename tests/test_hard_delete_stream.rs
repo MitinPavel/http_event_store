@@ -9,6 +9,7 @@ mod support;
 use support::task_domain::*;
 
 use hes::write::Event;
+use hes::read::Entry;
 use hes::client::Client;
 use hes::expected_version::ExpectedVersion;
 use hes::error::ApiError::*;
@@ -21,9 +22,9 @@ fn should_hard_delete_stream() {
     let stream_name = test_stream_name();
 
     client.append_to_stream(&stream_name, ExpectedVersion::NoStream, events).unwrap();
-    assert!(client.read_stream_events_forward(&stream_name, 0, 1, true).is_ok());
+    assert!(client.read_stream_events_forward::<Entry>(&stream_name, 0, 1, true).is_ok());
     assert!(client.hard_delete_stream(&stream_name, ExpectedVersion::Any).is_ok());
-    let result = client.read_stream_events_forward(&stream_name, 0, 1, true);
+    let result = client.read_stream_events_forward::<Entry>(&stream_name, 0, 1, true);
     assert_error!(StreamDeleted(..), result.unwrap_err());
 }
 

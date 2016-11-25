@@ -21,11 +21,11 @@ pub mod read {
     use std::collections::BTreeMap;
 
     #[derive(Serialize, Deserialize, Debug)]
-    pub struct Stream {
+    pub struct Stream<E> {
         pub author: BTreeMap<String, String>,
         #[serde(rename = "eTag")]
         pub e_tag: Option<String>,
-        pub entries: Vec<Entry>,
+        pub entries: Vec<E>,
         #[serde(rename = "headOfStream")]
         pub head_of_stream: bool,
         pub id: Url,

@@ -1,4 +1,5 @@
 use hyper::Client as HyperClient;
+use serde;
 
 use api::append_to_stream::Appender;
 use api::read_stream_events_forward::Reader;
@@ -40,14 +41,14 @@ impl Client {
     }
 
     //TODO Restrict `count` using u8 or u16
-    pub fn read_stream_events_forward(&self,
+    pub fn read_stream_events_forward<E: serde::Deserialize>(&self,
                                       stream_name: &str,
                                       start: u32,
                                       count: u32,
                                       resolve_link_tos: bool)
-                                      -> Result<Stream, ApiError> {
+                                      -> Result<Stream<E>, ApiError> {
         let reader = Reader::new(&self.connection_info, &self.http_client);
-        reader.read_stream_events_forward(stream_name, start, count, resolve_link_tos)
+        reader.read_stream_events_forward::<E>(stream_name, start, count, resolve_link_tos)
     }
 
     pub fn delete_stream(&self,
