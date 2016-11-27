@@ -57,7 +57,7 @@ fn build_headers(expected_version: ExpectedVersion) -> Headers {
 
 fn request_body<I>(events: I) -> String where I: IntoIterator<Item = Event> {
     let es: Vec<Event> = events.into_iter().collect::<_>();
-    serde_json::to_string(&es).unwrap()
+    serde_json::to_string(&es).unwrap() //TODO: Get rid of `unwrap`.
 }
 
 fn to_result(response: HyperResponse, stream_name: &str) -> Result<(), ApiError> {
