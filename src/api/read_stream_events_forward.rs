@@ -8,6 +8,7 @@ use serde;
 use serde_json;
 
 use read::Stream;
+use read::EmbedLevel;
 use error::ApiError;
 use connection::ConnectionInfo;
 use api::ESResolveLinkTos;
@@ -22,26 +23,27 @@ impl<'a> Reader<'a> {
         Reader { connection_info: connection_info, http_client: http_client }
     }
 
-    pub fn read_stream_events_forward<E: serde::Deserialize>(&self,
+    pub fn read_stream_events_forward<E: serde::Deserialize + EmbedLevel>(&self,
                                       stream_name: &str,
                                       start: u32,
                                       count: u32,
                                       resolve_link_tos: bool)
                                       -> Result<Stream<E>, ApiError> {
-        let response = try!(self.http_client.get(&self.url(stream_name, start, count))
+        let response = try!(self.http_client.get(&self.url::<E>(stream_name, start, count))
             .headers(build_headers(resolve_link_tos))
             .send());
 
         to_result::<E>(response, stream_name)
     }
 
-    fn url(&self, stream_name: &str, start: u32, count: u32) -> String {
-        format!("http://{}:{}/streams/{}/{}/forward/{}?embed=body",
+    fn url<E: EmbedLevel>(&self, stream_name: &str, start: u32, count: u32) -> String {
+        format!("http://{}:{}/streams/{}/{}/forward/{}?embed={}",
                 self.connection_info.host,
                 self.connection_info.port,
                 stream_name,
                 start,
-                count)
+                count,
+                E::level())
     }
 }
 
@@ -56,7 +58,7 @@ fn build_headers(resolve_link_tos: bool) -> Headers {
     headers
 }
 
-fn to_result<E: serde::Deserialize>(response: HyperResponse, stream_name: &str) -> Result<Stream<E>, ApiError> {
+fn to_result<E: serde::Deserialize + EmbedLevel>(response: HyperResponse, stream_name: &str) -> Result<Stream<E>, ApiError> {
     match response.status {
         StatusCode::Ok => read_stream::<E>(response),
         StatusCode::NotFound => Err(ApiError::StreamNotFound(stream_name.into())),
@@ -65,7 +67,7 @@ fn to_result<E: serde::Deserialize>(response: HyperResponse, stream_name: &str) 
     }
 }
 
-fn read_stream<E: serde::Deserialize>(mut response: HyperResponse) -> Result<Stream<E>, ApiError> {
+fn read_stream<E: serde::Deserialize + EmbedLevel>(mut response: HyperResponse) -> Result<Stream<E>, ApiError> {
     let mut body = String::new();
     try!(response.read_to_string(&mut body));
     let stream: Stream<E> = try!(serde_json::from_str(&body));

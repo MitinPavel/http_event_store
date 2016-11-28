@@ -4,7 +4,8 @@ extern crate uuid;
 
 use hes::client::Client;
 use hes::write::Event;
-use hes::read::Entry;
+use hes::read::BodyEntry;
+use hes::read::NoneBodyEntry;
 use hes::error::ApiError::*;
 use hes::expected_version::ExpectedVersion;
 
@@ -12,10 +13,45 @@ use hes::expected_version::ExpectedVersion;
 mod support;
 
 #[test]
+fn should_work_with_body_embed_entry_type() {
+    let event: Event = support::task_domain::TaskCreated {
+        name: format!("Created {:?}", chrono::UTC::now()),
+        event_id: uuid::Uuid::new_v4()
+    }.into();
+
+    let client = Client::default();
+    let stream_name = test_stream_name();
+    client.append_to_stream(&stream_name, ExpectedVersion::NoStream, vec![event]).unwrap();
+
+    let entries: Vec<BodyEntry> = client.read_stream_events_forward::<BodyEntry>(&stream_name, 0, 1, true)
+        .unwrap()
+        .entries;
+    assert_eq!("task-created", entries[0].summary);
+}
+
+#[test]
+fn should_work_with_none_embed_entry_type() {
+       let event: Event = support::task_domain::TaskCreated {
+        name: format!("Created {:?}", chrono::UTC::now()),
+        event_id: uuid::Uuid::new_v4()
+    }.into();
+
+    let client = Client::default();
+    let stream_name = test_stream_name();
+    client.append_to_stream(&stream_name, ExpectedVersion::NoStream, vec![event]).unwrap();
+
+
+    let entries: Vec<NoneBodyEntry> = client.read_stream_events_forward::<NoneBodyEntry>(&stream_name, 0, 1, true)
+        .unwrap()
+        .entries;
+    assert_eq!("task-created", entries[0].summary);
+}
+
+#[test]
 fn should_return_stream_not_found_error_attempting_to_read_nonexistent_stream() {
     let client = Client::default();
     let nonexistent_stream_name = "some-nonexistent";
-    let result = client.read_stream_events_forward::<Entry>(&nonexistent_stream_name, 0, 1, true);
+    let result = client.read_stream_events_forward::<BodyEntry>(&nonexistent_stream_name, 0, 1, true);
 
     assert_error!(StreamNotFound(..), result.unwrap_err());
 }
@@ -30,9 +66,14 @@ fn should_return_stream_deleted_error_attempting_to_read_deleted_stream() {
     let stream_name = format!("stream-{}", uuid::Uuid::new_v4().simple());
     client.append_to_stream(&stream_name, ExpectedVersion::NoStream, events).unwrap();
 
-    assert!(client.read_stream_events_forward::<Entry>(&stream_name, 0, 1, true).is_ok());
+    assert!(client.read_stream_events_forward::<BodyEntry>(&stream_name, 0, 1, true).is_ok());
     assert!(client.hard_delete_stream(&stream_name, ExpectedVersion::Any).is_ok());
 
-    let result = client.read_stream_events_forward::<Entry>(&stream_name, 0, 1, true);
+    let result = client.read_stream_events_forward::<BodyEntry>(&stream_name, 0, 1, true);
     assert_error!(StreamDeleted(..), result.unwrap_err());
+}
+
+//TODO Turn into a function on support::task_domain.
+fn test_stream_name() -> String {
+    format!("task-{}", uuid::Uuid::new_v4().simple())
 }

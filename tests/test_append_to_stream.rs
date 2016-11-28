@@ -11,7 +11,7 @@ mod support;
 use support::task_domain::*;
 
 use hes::write::Event;
-use hes::read::Entry;
+use hes::read::BodyEntry;
 use hes::client::Client;
 use hes::expected_version::ExpectedVersion;
 use hes::error::ApiError::*;
@@ -28,7 +28,7 @@ fn should_append_events_in_right_order() {
     let client = Client::default();
     let stream_name = test_stream_name();
     client.append_to_stream(&stream_name, ExpectedVersion::NoStream, events).unwrap();
-    let stream = client.read_stream_events_forward::<Entry>(&stream_name, 0, 2, true).unwrap();
+    let stream = client.read_stream_events_forward::<BodyEntry>(&stream_name, 0, 2, true).unwrap();
 
     assert_eq!("task-renamed", stream.entries[0].event_type);
     assert_eq!("task-created", stream.entries[1].event_type);
@@ -45,15 +45,15 @@ fn should_require_expected_version_to_be_correct() {
 
     let mut version = ExpectedVersion::NoStream;
     client.append_to_stream(&stream_name, version, vec![task_created_event().into()]).unwrap();
-    assert_eq!(1, client.read_stream_events_forward::<Entry>(&stream_name, 0, 3, true).unwrap().entries.len());
+    assert_eq!(1, client.read_stream_events_forward::<BodyEntry>(&stream_name, 0, 3, true).unwrap().entries.len());
 
     version = ExpectedVersion::Number(0);
     client.append_to_stream(&stream_name, version, vec![task_renamed_event().into()]).unwrap();
-    assert_eq!(2, client.read_stream_events_forward::<Entry>(&stream_name, 0, 3, true).unwrap().entries.len());
+    assert_eq!(2, client.read_stream_events_forward::<BodyEntry>(&stream_name, 0, 3, true).unwrap().entries.len());
 
     version = ExpectedVersion::Number(1);
     client.append_to_stream(&stream_name, version, vec![task_renamed_event().into()]).unwrap();
-    assert_eq!(3, client.read_stream_events_forward::<Entry>(&stream_name, 0, 3, true).unwrap().entries.len());
+    assert_eq!(3, client.read_stream_events_forward::<BodyEntry>(&stream_name, 0, 3, true).unwrap().entries.len());
 }
 
 #[test]

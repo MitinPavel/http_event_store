@@ -5,6 +5,7 @@ use api::append_to_stream::Appender;
 use api::read_stream_events_forward::Reader;
 use api::delete_stream::Deleter;
 use read::Stream;
+use read::EmbedLevel;
 use write::Event;
 use error::ApiError;
 use expected_version::ExpectedVersion;
@@ -41,7 +42,7 @@ impl Client {
     }
 
     //TODO Restrict `count` using u8 or u16
-    pub fn read_stream_events_forward<E: serde::Deserialize>(&self,
+    pub fn read_stream_events_forward<E: serde::Deserialize + EmbedLevel>(&self,
                                       stream_name: &str,
                                       start: u32,
                                       count: u32,

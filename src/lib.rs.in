@@ -39,7 +39,7 @@ pub mod read {
     }
 
     #[derive(Serialize, Deserialize, Debug)]
-    pub struct Entry {
+    pub struct BodyEntry {
         pub author: BTreeMap<String, String>,
         pub data: Option<serde_json::Value>,
         #[serde(rename = "eventId")]
@@ -69,8 +69,34 @@ pub mod read {
     }
 
     #[derive(Serialize, Deserialize, Debug)]
+    pub struct NoneBodyEntry {
+         pub author: BTreeMap<String, String>,
+         pub id: Url,
+         pub links: Vec<Link>,
+         pub summary: String,
+         pub title: String,
+         pub updated: DateTime<UTC>,
+    }
+
+    #[derive(Serialize, Deserialize, Debug)]
     pub struct Link {
         pub relation: String,
         pub uri: Url,
+    }
+
+    pub trait EmbedLevel {
+        fn level() -> String;
+    }
+
+    impl EmbedLevel for NoneBodyEntry {
+        fn level() -> String {
+            "None".into()
+        }
+    }
+
+    impl EmbedLevel for BodyEntry {
+        fn level() -> String {
+            "Body".into()
+        }
     }
 }
