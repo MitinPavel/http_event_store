@@ -30,7 +30,7 @@ impl<'a> Appender<'a> {
         where I: IntoIterator<Item = Event> {
         let response = try!(self.http_client.post(&self.url(stream_name))
             .headers(build_headers(expected_version))
-            .body(&request_body(events))
+            .body(&try!(request_body(events)))
             .send());
 
         to_result(response, stream_name)
@@ -55,9 +55,10 @@ fn build_headers(expected_version: ExpectedVersion) -> Headers {
     headers
 }
 
-fn request_body<I>(events: I) -> String where I: IntoIterator<Item = Event> {
+fn request_body<I>(events: I) -> Result<String, serde_json::Error>
+    where I: IntoIterator<Item = Event> {
     let es: Vec<Event> = events.into_iter().collect::<_>();
-    serde_json::to_string(&es).unwrap() //TODO: Get rid of `unwrap`.
+    serde_json::to_string(&es)
 }
 
 fn to_result(response: HyperResponse, stream_name: &str) -> Result<(), ApiError> {
