@@ -12,7 +12,8 @@ pub fn default_error(response: HyperResponse) -> Result<(), ApiError> {
     Err(ApiError::Restful(response))
 }
 
-pub fn check_stream_deleted(response: HyperResponse, stream_name: &str) -> Result<HyperResponse, ApiError> {
+pub fn check_stream_deleted(response: HyperResponse, stream_name: &str)
+                            -> Result<HyperResponse, ApiError> {
     match response.status {
         StatusCode::Gone => {
             if { response.status_raw().1 == STREAM_DELETED } {
@@ -26,7 +27,7 @@ pub fn check_stream_deleted(response: HyperResponse, stream_name: &str) -> Resul
 }
 
 pub fn check_wrong_expected_event_number(response: HyperResponse)
-                                   -> Result<HyperResponse, ApiError> {
+                                         -> Result<HyperResponse, ApiError> {
     match response.status {
         StatusCode::BadRequest => {
             if { response.status_raw().1 == WRONG_EXPECTED_EVENT_NUMBER } {

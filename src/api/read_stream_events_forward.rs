@@ -58,7 +58,8 @@ fn build_headers(resolve_link_tos: bool) -> Headers {
     headers
 }
 
-fn to_result<E: serde::Deserialize + EmbedLevel>(response: HyperResponse, stream_name: &str) -> Result<Stream<E>, ApiError> {
+fn to_result<E: serde::Deserialize + EmbedLevel>(response: HyperResponse, stream_name: &str)
+                                                 -> Result<Stream<E>, ApiError> {
     match response.status {
         StatusCode::Ok => read_stream::<E>(response),
         StatusCode::NotFound => Err(ApiError::StreamNotFound(stream_name.into())),
@@ -67,7 +68,8 @@ fn to_result<E: serde::Deserialize + EmbedLevel>(response: HyperResponse, stream
     }
 }
 
-fn read_stream<E: serde::Deserialize + EmbedLevel>(mut response: HyperResponse) -> Result<Stream<E>, ApiError> {
+fn read_stream<E: serde::Deserialize + EmbedLevel>(mut response: HyperResponse)
+                                                   -> Result<Stream<E>, ApiError> {
     let mut body = String::new();
     try!(response.read_to_string(&mut body));
     let stream: Stream<E> = try!(serde_json::from_str(&body));
