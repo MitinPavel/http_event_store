@@ -40,7 +40,6 @@ fn should_fail_if_expected_version_is_not_correct() {
     assert_error!(WrongExpectedEventNumber(..), result.unwrap_err());
 }
 
-//TODO Turn into a function on support::task_domain.
 fn test_stream_name() -> String {
     format!("task-{}", uuid::Uuid::new_v4().simple())
 }

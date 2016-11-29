@@ -80,6 +80,7 @@ fn should_fail_appending_with_any_expected_version_to_deleted_stream() {
     assert_error!(StreamDeleted(..), result.unwrap_err());
 }
 
+//TODO
 #[test]
 fn should_cope_with_empty_event_collection() {}
 

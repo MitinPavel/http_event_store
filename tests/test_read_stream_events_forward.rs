@@ -12,9 +12,11 @@ use hes::expected_version::ExpectedVersion;
 #[macro_use]
 mod support;
 
+use support::task_domain::*;
+
 #[test]
 fn should_work_with_body_embed_entry_type() {
-    let event: Event = support::task_domain::TaskCreated {
+    let event: Event = TaskCreated {
         name: format!("Created {:?}", chrono::UTC::now()),
         event_id: uuid::Uuid::new_v4()
     }.into();
@@ -31,7 +33,7 @@ fn should_work_with_body_embed_entry_type() {
 
 #[test]
 fn should_work_with_none_embed_entry_type() {
-       let event: Event = support::task_domain::TaskCreated {
+       let event: Event = TaskCreated {
         name: format!("Created {:?}", chrono::UTC::now()),
         event_id: uuid::Uuid::new_v4()
     }.into();
@@ -73,7 +75,6 @@ fn should_return_stream_deleted_error_attempting_to_read_deleted_stream() {
     assert_error!(StreamDeleted(..), result.unwrap_err());
 }
 
-//TODO Turn into a function on support::task_domain.
 fn test_stream_name() -> String {
     format!("task-{}", uuid::Uuid::new_v4().simple())
 }
