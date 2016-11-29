@@ -20,8 +20,6 @@ cd ~/bin/EventStore-OSS-Ubuntu-14.04-v3.8.1
 TODO
 ====
 
-Find MAX value for `Expected Version`.
-
 Handle HTTP status codes:
 * InternalServerError
 * ServiceUnavailable

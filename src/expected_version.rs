@@ -1,6 +1,6 @@
 #[derive(Debug)]
 pub enum ExpectedVersion {
-    Number(u64),
+    Number(i32),
     Empty,       // The stream should exist but should be empty.
     NoStream,    // The stream should not exist at the time of the writing.
     Any,         // This write should never conflict with anything and should always succeed.
@@ -36,7 +36,7 @@ impl From<String> for ExpectedVersion {
 
 impl ExpectedVersion {
     fn parse_number_or_unexpected(string: String) -> ExpectedVersion {
-        match string.parse::<u64>() {
+        match string.parse::<i32>() {
             Ok(n) =>  ExpectedVersion::Number(n),
             Err(_) => ExpectedVersion::Unexpected(string)
         }
