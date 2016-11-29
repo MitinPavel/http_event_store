@@ -46,11 +46,10 @@ impl<'a> Appender<'a> {
 
 fn build_headers(expected_version: ExpectedVersion) -> Headers {
     let mut headers = Headers::new();
+    headers.set(ESExpectedVersion(expected_version.into()));
     headers.set(
         ContentType(Mime(TopLevel::Application,
-                         SubLevel::Ext("vnd.eventstore.events+json".to_owned()), vec![]))
-    );
-    headers.set(ESExpectedVersion(expected_version.into()));
+                         SubLevel::Ext("vnd.eventstore.events+json".to_owned()), vec![])));
 
     headers
 }

@@ -49,11 +49,11 @@ impl<'a> Reader<'a> {
 
 fn build_headers(resolve_link_tos: bool) -> Headers {
     let mut headers = Headers::new();
+    headers.set(ESResolveLinkTos(resolve_link_tos));
     headers.set(
         Accept(vec![
         qitem(Mime(TopLevel::Application,
                    SubLevel::Ext("vnd.eventstore.atom+json".to_owned()), vec![]))]));
-    headers.set(ESResolveLinkTos(resolve_link_tos));
 
     headers
 }
