@@ -41,11 +41,10 @@ impl Client {
         appender.append(stream_name, expected_version, events)
     }
 
-    //TODO Restrict `count` using u8 or u16
     pub fn read_stream_events_forward<E: serde::Deserialize + EmbedLevel>(&self,
                                       stream_name: &str,
-                                      start: u32,
-                                      count: u32,
+                                      start: i32,
+                                      count: i32,
                                       resolve_link_tos: bool)
                                       -> Result<Stream<E>, ApiError> {
         let reader = Reader::new(&self.connection_info, &self.http_client);

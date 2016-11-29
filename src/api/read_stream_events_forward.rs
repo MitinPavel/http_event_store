@@ -25,8 +25,8 @@ impl<'a> Reader<'a> {
 
     pub fn read_stream_events_forward<E: serde::Deserialize + EmbedLevel>(&self,
                                       stream_name: &str,
-                                      start: u32,
-                                      count: u32,
+                                      start: i32,
+                                      count: i32,
                                       resolve_link_tos: bool)
                                       -> Result<Stream<E>, ApiError> {
         let response = try!(self.http_client.get(&self.url::<E>(stream_name, start, count))
@@ -36,7 +36,7 @@ impl<'a> Reader<'a> {
         to_result::<E>(response, stream_name)
     }
 
-    fn url<E: EmbedLevel>(&self, stream_name: &str, start: u32, count: u32) -> String {
+    fn url<E: EmbedLevel>(&self, stream_name: &str, start: i32, count: i32) -> String {
         format!("http://{}:{}/streams/{}/{}/forward/{}?embed={}",
                 self.connection_info.host,
                 self.connection_info.port,
