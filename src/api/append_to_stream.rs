@@ -28,10 +28,10 @@ impl<'a> Appender<'a> {
                      expected_version: ExpectedVersion,
                      events: I) -> Result<(), ApiError>
         where I: IntoIterator<Item = Event> {
-        let response = try!(self.http_client.post(&self.url(stream_name))
+        let response = self.http_client.post(&self.url(stream_name))
             .headers(build_headers(expected_version))
-            .body(&try!(request_body(events)))
-            .send());
+            .body(&request_body(events)?)
+            .send()?;
 
         to_result(response, stream_name)
     }

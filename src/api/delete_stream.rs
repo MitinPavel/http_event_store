@@ -35,9 +35,9 @@ impl<'a> Deleter<'a> {
                  expected_version: ExpectedVersion,
                  is_hard: bool)
                  -> Result<(), ApiError> {
-        let response = try!(self.http_client.delete(&self.url(stream_name))
+        let response = self.http_client.delete(&self.url(stream_name))
             .headers(build_headers(expected_version, is_hard))
-            .send());
+            .send()?;
 
         to_result(response, stream_name)
     }

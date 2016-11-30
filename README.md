@@ -3,10 +3,10 @@ Environment
 
 ```
 $ uname -a
-Linux blah 4.4.0-45-generic #66-Ubuntu SMP Wed Oct 19 14:12:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+Linux blah 4.4.0-47-generic #68-Ubuntu SMP Wed Oct 26 19:39:52 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
 
 $ rustc --version
-rustc 1.10.0 (cfcb716cf 2016-07-03)
+rustc 1.13.0 (2c6933acc 2016-11-07)
 ```
 
 Run test Event Store sever

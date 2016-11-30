@@ -24,14 +24,14 @@ impl<'a> Reader<'a> {
     }
 
     pub fn read_stream_events_forward<E: serde::Deserialize + EmbedLevel>(&self,
-                                      stream_name: &str,
-                                      start: i32,
-                                      count: i32,
-                                      resolve_link_tos: bool)
-                                      -> Result<Stream<E>, ApiError> {
-        let response = try!(self.http_client.get(&self.url::<E>(stream_name, start, count))
+                                                                          stream_name: &str,
+                                                                          start: i32,
+                                                                          count: i32,
+                                                                          resolve_link_tos: bool)
+                                                                          -> Result<Stream<E>, ApiError> {
+        let response = self.http_client.get(&self.url::<E>(stream_name, start, count))
             .headers(build_headers(resolve_link_tos))
-            .send());
+            .send()?;
 
         to_result::<E>(response, stream_name)
     }
@@ -71,8 +71,8 @@ fn to_result<E: serde::Deserialize + EmbedLevel>(response: HyperResponse, stream
 fn read_stream<E: serde::Deserialize + EmbedLevel>(mut response: HyperResponse)
                                                    -> Result<Stream<E>, ApiError> {
     let mut body = String::new();
-    try!(response.read_to_string(&mut body));
-    let stream: Stream<E> = try!(serde_json::from_str(&body));
+    response.read_to_string(&mut body)?;
+    let stream: Stream<E> = serde_json::from_str(&body)?;
 
     Ok(stream)
 }
