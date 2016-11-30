@@ -48,7 +48,7 @@ impl Client {
                                       resolve_link_tos: bool)
                                       -> Result<Stream<E>, ApiError> {
         let reader = Reader::new(&self.connection_info, &self.http_client);
-        reader.read_stream_events_forward::<E>(stream_name, start, count, resolve_link_tos)
+        reader.read_forward::<E>(stream_name, start, count, resolve_link_tos)
     }
 
     pub fn delete_stream(&self,

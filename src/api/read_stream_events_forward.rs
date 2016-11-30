@@ -23,12 +23,12 @@ impl<'a> Reader<'a> {
         Reader { connection_info: connection_info, http_client: http_client }
     }
 
-    pub fn read_stream_events_forward<E: serde::Deserialize + EmbedLevel>(&self,
-                                                                          stream_name: &str,
-                                                                          start: i32,
-                                                                          count: i32,
-                                                                          resolve_link_tos: bool)
-                                                                          -> Result<Stream<E>, ApiError> {
+    pub fn read_forward<E: serde::Deserialize + EmbedLevel>(&self,
+                                                            stream_name: &str,
+                                                            start: i32,
+                                                            count: i32,
+                                                            resolve_link_tos: bool)
+                                                            -> Result<Stream<E>, ApiError> {
         let response = self.http_client.get(&self.url::<E>(stream_name, start, count))
             .headers(build_headers(resolve_link_tos))
             .send()?;
