@@ -5,7 +5,7 @@ extern crate uuid;
 use hes::client::Client;
 use hes::write::Event;
 use hes::read::BodyEntry;
-use hes::read::NoneBodyEntry;
+use hes::read::NoneEntry;
 use hes::error::ApiError::*;
 use hes::expected_version::ExpectedVersion;
 
@@ -43,7 +43,7 @@ fn should_work_with_none_embed_entry_type() {
     client.append_to_stream(&stream_name, ExpectedVersion::NoStream, vec![event]).unwrap();
 
 
-    let entries: Vec<NoneBodyEntry> = client.read_stream_events_forward::<NoneBodyEntry>(&stream_name, 0, 1, true)
+    let entries: Vec<NoneEntry> = client.read_stream_events_forward::<NoneEntry>(&stream_name, 0, 1, true)
         .unwrap()
         .entries;
     assert_eq!("task-created", entries[0].summary);

@@ -69,7 +69,7 @@ pub mod read {
     }
 
     #[derive(Serialize, Deserialize, Debug)]
-    pub struct NoneBodyEntry {
+    pub struct NoneEntry {
          pub author: BTreeMap<String, String>,
          pub id: Url,
          pub links: Vec<Link>,
@@ -88,7 +88,7 @@ pub mod read {
         fn level() -> String;
     }
 
-    impl EmbedLevel for NoneBodyEntry {
+    impl EmbedLevel for NoneEntry {
         fn level() -> String {
             "None".into()
         }
