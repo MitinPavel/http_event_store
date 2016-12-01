@@ -10,7 +10,7 @@ Rust, Database, Event Store, Event Sourcing, CQRS, RESTful API, AtomPub
  
 ## Getting started
 
-TODO: show `Cargo.toml`.
+Available from [crates.io](https://crates.io/crates/http_event_store).
 
 ```
 extern crate http_event_store;
