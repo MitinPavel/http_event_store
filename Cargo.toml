@@ -6,7 +6,6 @@ description = "Greg's Event Store Rust HTTP Client"
 keywords = ["EventStore", "EventSourcing", "CQRS", "RESTful", "AtomPub"]
 readme = "README.md"
 license = "MIT"
-license-file = "LICENSE"
 repository = "https://github.com/MitinPavel/http_event_store"
 build = "build.rs"
 
