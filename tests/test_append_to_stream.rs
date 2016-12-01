@@ -80,9 +80,12 @@ fn should_fail_appending_with_any_expected_version_to_deleted_stream() {
     assert_error!(StreamDeleted(..), result.unwrap_err());
 }
 
-//TODO
 #[test]
-fn should_cope_with_empty_event_collection() {}
+fn should_cope_with_empty_event_collection() {
+    let client = Client::default();
+    let result = client.append_to_stream(&test_stream_name(), ExpectedVersion::NoStream, vec![]);
+    assert_error!(Restful(..), result.unwrap_err());
+}
 
 fn test_stream_name() -> String {
     format!("task-{}", uuid::Uuid::new_v4().simple())
@@ -91,6 +94,7 @@ fn test_stream_name() -> String {
 fn task_created_event() -> TaskCreated {
     TaskCreated { name: format!("Created {:?}", chrono::UTC::now()), event_id: uuid::Uuid::new_v4() }
 }
+
 fn task_renamed_event() -> TaskRenamed {
     TaskRenamed { name: format!("Renamed {:?}", chrono::UTC::now()), event_id: uuid::Uuid::new_v4() }
 }
