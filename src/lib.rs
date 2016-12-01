@@ -4,7 +4,6 @@
 #[macro_use]
 extern crate hyper;
 
-extern crate url;
 extern crate uuid;
 extern crate chrono;
 

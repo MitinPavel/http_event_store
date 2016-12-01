@@ -16,7 +16,6 @@ pub mod write {
 pub mod read {
     use serde_json;
     use uuid::Uuid;
-    use url::Url;
     use chrono::{DateTime, UTC};
     use std::collections::BTreeMap;
 
@@ -28,7 +27,7 @@ pub mod read {
         pub entries: Vec<E>,
         #[serde(rename = "headOfStream")]
         pub head_of_stream: bool,
-        pub id: Url,
+        pub id: String,
         pub links: Vec<Link>,
         #[serde(rename = "selfUrl")]
         pub self_url: Option<String>,
@@ -48,7 +47,7 @@ pub mod read {
         pub event_number: i32,
         #[serde(rename = "eventType")]
         pub event_type: String,
-        pub id: Url,
+        pub id: String,
         #[serde(rename = "isJson")]
         pub is_json: bool,
         #[serde(rename = "isLinkMetaData")]
@@ -71,7 +70,7 @@ pub mod read {
     #[derive(Serialize, Deserialize, Debug)]
     pub struct NoneEntry {
          pub author: BTreeMap<String, String>,
-         pub id: Url,
+         pub id: String,
          pub links: Vec<Link>,
          pub summary: String,
          pub title: String,
@@ -81,7 +80,7 @@ pub mod read {
     #[derive(Serialize, Deserialize, Debug)]
     pub struct Link {
         pub relation: String,
-        pub uri: Url,
+        pub uri: String,
     }
 
     pub trait EmbedLevel {
