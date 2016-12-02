@@ -13,14 +13,14 @@ use error::ApiError;
 use connection::ConnectionInfo;
 use api::ESResolveLinkTos;
 
-pub struct Reader<'a> {
+pub struct StreamReader<'a> {
     connection_info: &'a ConnectionInfo,
     http_client: &'a HyperClient,
 }
 
-impl<'a> Reader<'a> {
-    pub fn new(connection_info: &'a ConnectionInfo, http_client: &'a HyperClient) -> Reader<'a> {
-        Reader { connection_info: connection_info, http_client: http_client }
+impl<'a> StreamReader<'a> {
+    pub fn new(connection_info: &'a ConnectionInfo, http_client: &'a HyperClient) -> StreamReader<'a> {
+        StreamReader { connection_info: connection_info, http_client: http_client }
     }
 
     pub fn read_forward<E: serde::Deserialize + EmbedLevel>(&self,

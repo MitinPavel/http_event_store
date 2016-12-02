@@ -2,7 +2,7 @@ use hyper::Client as HyperClient;
 use serde;
 
 use api::append_to_stream::Appender;
-use api::read_stream_events_forward::Reader;
+use api::read_stream_events_forward::StreamReader;
 use api::delete_stream::Deleter;
 use read::Stream;
 use read::EmbedLevel;
@@ -47,7 +47,7 @@ impl Client {
                                       count: i32,
                                       resolve_link_tos: bool)
                                       -> Result<Stream<E>, ApiError> {
-        let reader = Reader::new(&self.connection_info, &self.http_client);
+        let reader = StreamReader::new(&self.connection_info, &self.http_client);
         reader.read_forward::<E>(stream_name, start, count, resolve_link_tos)
     }
 
