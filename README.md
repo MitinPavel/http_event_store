@@ -2,7 +2,7 @@
 
 [Rust](https://www.rust-lang.org/en-US/) HTTP connector to [Event Store](https://geteventstore.com/).
 
-Is currently targeting EventStore 3.x.
+Is currently targeting EventStore 3.x. (see Versions section below)
 
 ## Tags
 
@@ -83,16 +83,22 @@ cURL: `curl -v -X DELETE http://127.0.0.1:2113/streams/foo2 -H "ES-HardDelete:tr
 
 Rust: `client.hard_delete_stream("foo", ExpectedVersion::Any);`
 
-## Development environment
+## Rust and Get Event Store versions
 
 Tested on Rust 1.13 and 1.14.
 
 ```
-$ uname -a
-Linux blah 4.4.0-59-generic #80-Ubuntu SMP Fri Jan 6 17:47:47 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
-
 $ rustc --version
 rustc 1.14.0 (e8a012324 2016-12-16)
+```
+
+Tested on Get Event Store 3.8.1 and 3.9.3 for Ubuntu 14.04
+
+## Development environment
+
+```
+$ uname -a
+Linux blah 4.4.0-59-generic #80-Ubuntu SMP Fri Jan 6 17:47:47 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
 ```
 
 ## License
