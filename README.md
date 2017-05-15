@@ -85,11 +85,11 @@ Rust: `client.hard_delete_stream("foo", ExpectedVersion::Any);`
 
 ## Rust and Get Event Store versions
 
-Tested on Rust 1.13 and 1.14.
+Tested on Rust 1.13, 1.14, 1.17.
 
 ```
 $ rustc --version
-rustc 1.14.0 (e8a012324 2016-12-16)
+rustc 1.17.0 (56124baa9 2017-04-24)
 ```
 
 Tested on Get Event Store 3.8.1 and 3.9.3 for Ubuntu 14.04
@@ -98,7 +98,8 @@ Tested on Get Event Store 3.8.1 and 3.9.3 for Ubuntu 14.04
 
 ```
 $ uname -a
-Linux blah 4.4.0-59-generic #80-Ubuntu SMP Fri Jan 6 17:47:47 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+Linux blah 4.4.0-77-generic #98-Ubuntu SMP Wed Apr 26 08:34:02 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+
 ```
 
 ## License
